@@ -1,0 +1,29 @@
+version: '3'
+services:
+  login-service:
+    build: ./login-service
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+
+  activity-service:
+    build: ./activity-service
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: user
+      POSTGRES_DB: activities
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
