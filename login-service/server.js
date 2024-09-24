@@ -1,37 +1,70 @@
+
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const path = require('path');
-const cors = require('cors'); // Import CORS middleware
+const cors = require('cors');
+const path = require('path');  // Add this line to include the path module
+const { Pool } = require('pg');
 
 const app = express();
 app.use(express.json());
-
-// Enable CORS for all routes
 app.use(cors());
 
-// Simulated database
-const users = [];
-
-// Route to register a new user
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  users.push({ username, password: hashedPassword });
-  res.json({ message: 'User registered successfully' });
+// PostgreSQL Connection Pool
+const pool = new Pool({
+  user: 'postgres',
+  host: 'postgres',
+  database: 'activities',
+  password: 'user',
+  port: 5432,
 });
 
-// Route to login and generate a JWT token
+// Register a new user
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if the user already exists
+    const existingUser = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the new user into the database
+    await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to register user', error: err.message });
+  }
+});
+
+// Login and generate JWT token
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const user = users.find(u => u.username === username);
-  if (!user) return res.status(400).json({ message: 'User not found' });
 
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) return res.status(400).json({ message: 'Invalid password' });
+  try {
+    const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
 
-  const token = jwt.sign({ username: user.username }, 'secretKey', { expiresIn: '1h' });
-  res.json({ token });
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    const user = userResult.rows[0];
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Invalid password' });
+    }
+
+    const token = jwt.sign({ username: user.username }, 'secretKey', { expiresIn: '1h' });
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ message: 'Login failed', error: err.message });
+  }
 });
 
 // Serve the HTML page for login
