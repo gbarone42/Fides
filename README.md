@@ -127,4 +127,4 @@ curl -X POST http://localhost:4000/activities \
 
 List All Activities:
 curl -X GET http://localhost:4000/activities \
--H "Authorization: Bearer <JWT_TOKEN
+-H "Authorization: Bearer <JWT_TOKEN>"
