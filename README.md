@@ -1,291 +1,136 @@
-Activity & Login Service Project
-
+Project README
 Project Overview
-
-This project consists of two services:
-
-
-
-Login Service: A service to register and login users.
-
-Activity Service: A service that allows users to create, view, update, and delete activities.
-
-Dependencies
-
-Make sure the following dependencies are installed before running the project:
-
-
-
-System Requirements
-
-Docker: Install Docker for container management.
-
-Docker Compose: Install Docker Compose to run the services together.
-
-PostgreSQL: The project uses PostgreSQL as the database for storing users and activities.
-
-Node.js Dependencies
-
-Express: For building the REST API.
-
-jsonwebtoken: For managing JWT tokens for authentication.
-
-bcryptjs: For hashing user passwords.
-
-pg: For interacting with PostgreSQL.
-
-These dependencies are automatically installed when running npm install.
-
-
-
-How to Set Up and Run the Project
-
-Step 1: Clone the Repository
-
-First, clone the repository to your local machine:
-
-
-
-git clone <repository-url>
-
-cd <repository-folder>
-
-Usa il codice con cautela.
-
-
-
-Step 2: Set Up Docker
-
-The services are containerized with Docker, so you need Docker and Docker Compose to run them.
-
-
-
-Step 3: Running the Services
-
-To start the project services (login-service, activity-service, and PostgreSQL), run the following commands:
-
-
-
-Bash
-
-docker-compose up --build
-
-Usa il codice con cautela.
-
-
-
-This will build and start the following services:
-
-
-
-Login Service on port 3000
-
-Activity Service on port 4000
-
-PostgreSQL on port 5432
-
-Step 4: Accessing the Services
-
-Login Service:
-
-
-
-Register a user at http://localhost:3000/register
-
-Login at http://localhost:3000/login
-
-You will receive a JWT token upon login.
-
-Activity Service:
-
-
-
-Create, view, update, and delete activities at http://localhost:4000/web/activities
-
-You can either use the JWT Token to authenticate or the username and password via the UI.
-
-Step 5: Environment Variables
-
-Make sure that the .env file is correctly configured with the following details (if needed):
-
-
-
-POSTGRES_USER=postgres
-
-POSTGRES_PASSWORD=user
-
-POSTGRES_DB=activities
-
-NODE_ENV=development
-
-JWT_SECRET=secretKey
-
-Basic PostgreSQL Commands
-
-Connecting to PostgreSQL via Docker
-
-
-
-To enter the PostgreSQL container and interact with the database, run the following command:
-
-
-
-Bash
-
+This project consists of two main services:
+
+Login Service - Handles user authentication.
+Activity Service - Allows users to create, update, delete, and retrieve activities.
+Both services are Dockerized, and the data is stored in a PostgreSQL database.
+
+Prerequisites
+1. System Requirements
+Docker
+Docker Compose
+Node.js (v14 or higher)
+2. Dependencies to be Installed
+Node.js Packages
+express - Web framework for Node.js.
+jsonwebtoken - Library to handle JWT tokens.
+bcryptjs - For password hashing.
+pg - PostgreSQL client for Node.js.
+The required dependencies are listed in package.json. To install them, run:
+
+bash
+Copy code
+npm install
+Services and Setup
+1. Docker Setup
+To run the services with Docker, make sure Docker and Docker Compose are installed on your machine. Use the following commands to set up and start the services.
+
+2. Activating Services with Docker Compose
+Navigate to the project root directory.
+Run the following commands to build and start the services:
+bash
+Copy code
+docker-compose down   # Stop any previous running instances
+docker-compose up --build   # Build and start the services
+This command will:
+
+Build the Login Service and Activity Service.
+Start the PostgreSQL container.
+3. Basic Docker Commands
+Start all services:
+bash
+Copy code
+docker-compose up
+Stop all services:
+bash
+Copy code
+docker-compose down
+List all running containers:
+bash
+Copy code
+docker ps
+Access PostgreSQL container:
+bash
+Copy code
 docker exec -it fides-postgres-1 psql -U postgres -d activities
+PostgreSQL Setup
+1. Database Structure
+The project uses a PostgreSQL database with two tables:
 
-Usa il codice con cautela.
+users: Stores username and hashed password.
+activities: Stores activity data with user associations.
+2. Creating or Viewing Tables
+To create the required tables, log in to the PostgreSQL container and execute the following commands:
 
-
-
-Common PostgreSQL Queries:
-
-
-
-List all users:
-
-SQL
-
-SELECT * FROM users;
-
-Usa il codice con cautela.
-
-
-
-List all activities:
-
-SQL
-
-SELECT * FROM activities;
-
-Usa il codice con cautela.
-
-
-
-Delete all users:
-
-SQL
-
-DELETE FROM users;
-
-Usa il codice con cautela.
-
-
-
-Delete all activities:
-
-SQL
-
-DELETE FROM activities;
-
-Usa il codice con cautela.
-
-
-
-Drop and recreate users and activities table:
-
-SQL
-
-DROP TABLE users;
-
-DROP TABLE activities;
-
-
-
+Log into PostgreSQL:
+bash
+Copy code
+docker exec -it fides-postgres-1 psql -U postgres -d activities
+Create Tables:
+sql
+Copy code
 CREATE TABLE users (
-
-    id SERIAL PRIMARY KEY,
-
-    username VARCHAR(255) UNIQUE,
-
-    password TEXT
-
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) UNIQUE,
+  password TEXT
 );
-
-
 
 CREATE TABLE activities (
-
-    id SERIAL PRIMARY KEY,
-
-    title VARCHAR(255),
-
-    description TEXT,
-
-    date DATE,
-
-    user_id INTEGER REFERENCES users(id)
-
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255),
+  description TEXT,
+  date DATE,
+  user_id INTEGER REFERENCES users(id)
 );
-
-Usa il codice con cautela.
-
-
-
-Stopping and Restarting Services
-
-To stop the services:
-
-
-
-Bash
-
-docker-compose down
-
-Usa il codice con cautela.
-
-
-
-To restart the services after making changes:
-
-
-
-Bash
-
-docker-compose up --build
-
-Usa il codice con cautela.
-
-
-
-Troubleshooting
-
-Common Issues:
-
-
-
-CORS Policy Errors: Ensure that the CORS configuration is enabled in the backend (login-service and activity-service) by setting appropriate headers.
-
-JWT Token Expiration: Tokens are valid for a limited time (typically 1 hour). If a token expires, you must log in again to obtain a new token.
-
-Database Not Connecting: Ensure that PostgreSQL is running and accepting connections on port 5432. Verify the docker-compose.yml and .env file for correct credentials.
-
-Clearing Docker Containers and Images:
-
-
-
-If you encounter errors with Docker, you can clear the containers and images:
-
-
-
-Bash
-
-docker-compose down --rmi all
-
-Usa il codice con cautela.
-
-
-
-This will remove all containers and images related to the project.
-
-
-
-License
-
-This project is licensed under the MIT License.
-
-
-
-
-
-This formatted content includes proper code blocks for commands and SQL queries, making it easier to read and follow the instructions. 
+3. Viewing Data in PostgreSQL
+View all users:
+sql
+Copy code
+SELECT * FROM users;
+View all activities:
+sql
+Copy code
+SELECT * FROM activities;
+Join users and activities:
+sql
+Copy code
+SELECT activities.id, activities.title, activities.description, activities.date, users.username 
+FROM activities
+JOIN users ON activities.user_id = users.id;
+Common Commands in PostgreSQL
+Delete All Users:
+sql
+Copy code
+DELETE FROM users;
+Delete All Activities:
+sql
+Copy code
+DELETE FROM activities;
+Testing the Services
+1. Login Service
+Register a New User:
+bash
+Copy code
+curl -X POST http://localhost:3000/register \
+-H "Content-Type: application/json" \
+-d '{"username":"user","password":"password"}'
+Login and Get JWT Token:
+bash
+Copy code
+curl -X POST http://localhost:3000/login \
+-H "Content-Type: application/json" \
+-d '{"username":"user","password":"password"}'
+2. Activity Service
+Create a New Activity:
+bash
+Copy code
+curl -X POST http://localhost:4000/activities \
+-H "Authorization: Bearer <JWT_TOKEN>" \
+-H "Content-Type: application/json" \
+-d '{"title": "New Activity", "description": "Activity Description", "date": "2024-09-21"}'
+List All Activities:
+bash
+Copy code
+curl -X GET http://localhost:4000/activities \
+-H "Authorization: Bearer <JWT_TOKEN
