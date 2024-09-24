@@ -128,3 +128,14 @@ curl -X POST http://localhost:4000/activities \
 List All Activities:
 curl -X GET http://localhost:4000/activities \
 -H "Authorization: Bearer <JWT_TOKEN>"
+
+
+
+
+
+
+docker exec -it fides-postgres-1 psql -U postgres -d activities
+
+docker-compose down   # Stop any previous running instances
+docker-compose up --build   # Build and start the services
+
