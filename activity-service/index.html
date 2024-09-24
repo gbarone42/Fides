@@ -1,33 +1,113 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Activity List</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Activities</title>
+</head>
+<body>
+    <h1>Manage Activities</h1>
+
+    <!-- JWT Token Input -->
+    <label>Enter your JWT token: <input type="text" id="jwtToken" /></label>
+    <br/><br/>
+
+    <!-- Form to create or update an activity -->
+    <form id="activityForm">
+        <input type="hidden" id="activityId" />
+        <label>Title: <input type="text" id="title" /></label><br/>
+        <label>Description: <input type="text" id="description" /></label><br/>
+        <label>Date: <input type="date" id="date" /></label><br/>
+        <button type="submit">Submit</button>
+    </form>
+
+    <!-- Filter activities -->
+    <h2>Filter Activities</h2>
+    <label>Title: <input type="text" id="filterTitle" /></label>
+    <label>Date: <input type="date" id="filterDate" /></label>
+    <button onclick="filterActivities()">Filter</button>
+
+    <!-- Activity list -->
+    <h2>Activities</h2>
+    <ul id="activityList"></ul>
+
     <script>
-      async function loadActivities() {
-        const token = prompt('Enter your JWT token:');
+        // Function to get JWT token from the input
+        function getToken() {
+            return document.getElementById('jwtToken').value;
+        }
 
-        const response = await fetch('/activities', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-          }
+        // Submit new activity
+        document.getElementById('activityForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const token = getToken();  // Get JWT token from input
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const date = document.getElementById('date').value;
+
+            fetch('http://localhost:4000/activities', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, description, date })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                loadActivities();
+            });
         });
 
-        const activities = await response.json();
-        const activitiesList = document.getElementById('activities-list');
+        // Load all activities
+        function loadActivities() {
+            const token = getToken();  // Get JWT token from input
 
-        activities.forEach(activity => {
-          const li = document.createElement('li');
-          li.textContent = `${activity.title} - ${activity.description} - ${activity.date}`;
-          activitiesList.appendChild(li);
-        });
-      }
+            fetch('http://localhost:4000/activities', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const activityList = document.getElementById('activityList');
+                activityList.innerHTML = '';
+                data.forEach(activity => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${activity.title} - ${activity.description} - ${activity.date}`;
+                    activityList.appendChild(listItem);
+                });
+            });
+        }
+
+        // Filter activities by title or date
+        function filterActivities() {
+            const token = getToken();  // Get JWT token from input
+            const title = document.getElementById('filterTitle').value;
+            const date = document.getElementById('filterDate').value;
+
+            let url = `http://localhost:4000/activities/filter?`;
+            if (title) url += `title=${title}&`;
+            if (date) url += `date=${date}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const activityList = document.getElementById('activityList');
+                activityList.innerHTML = '';
+                data.forEach(activity => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${activity.title} - ${activity.description} - ${activity.date}`;
+                    activityList.appendChild(listItem);
+                });
+            });
+        }
+
+        // Optionally, load activities when the page loads
+        // loadActivities();
     </script>
-  </head>
-  <body onload="loadActivities()">
-    <h1>Activities</h1>
-    <ul id="activities-list"></ul>
-  </body>
+</body>
 </html>
-
