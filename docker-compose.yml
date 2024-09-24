@@ -6,6 +6,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+    depends_on:
+      - postgres
 
   activity-service:
     build: ./activity-service
@@ -26,4 +28,3 @@ services:
       - "5432:5432"
     volumes:
       - ./data:/var/lib/postgresql/data
-

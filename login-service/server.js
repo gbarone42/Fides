@@ -2,9 +2,13 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const cors = require('cors'); // Import CORS middleware
 
 const app = express();
 app.use(express.json());
+
+// Enable CORS for all routes
+app.use(cors());
 
 // Simulated database
 const users = [];
