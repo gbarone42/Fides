@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: user
+      POSTGRES_DB: activities
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Ensure this volume is mapped correctly for data persistence
+      - ./db-init:/docker-entrypoint-initdb.d  # This is for initializing the database
+    ports:
+      - "5432:5432"
+    networks:
+      - fides_network
+
+  login-service:
+    build: ./login-service
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://postgres:user@postgres:5432/activities
+    networks:
+      - fides_network
+
+  activity-service:
+    build: ./activity-service
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+    networks:
+      - fides_network
+
+volumes:
+  postgres_data:  # This defines the named volume
+
+networks:
+  fides_network:

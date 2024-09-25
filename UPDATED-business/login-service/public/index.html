@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <script>
+    async function register() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const role = document.querySelector('input[name="role"]:checked').value;
+
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role })
+      });
+
+      const data = await response.json();
+      console.log(data);
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        alert('Login successful!');
+      } else {
+        alert('Login failed');
+      }
+    }
+  </script>
+</head>
+<body>
+  <h2>Login or Register</h2>
+  <div>
+    <input type="text" id="username" placeholder="Username" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <div>
+      <label><input type="radio" name="role" value="business" /> Business</label>
+      <label><input type="radio" name="role" value="employee" /> Employee</label>
+    </div>
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+  </div>
+</body>
+</html>
