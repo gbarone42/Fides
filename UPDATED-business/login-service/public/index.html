@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activities</title>
   <script>
+    let token = null;
+
     async function register() {
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
@@ -30,25 +34,49 @@
 
       const data = await response.json();
       if (data.token) {
-        localStorage.setItem('token', data.token);
-        alert('Login successful!');
-      } else {
-        alert('Login failed');
+        token = data.token;
+        document.getElementById('activities').style.display = 'block';
+        fetchActivities();
       }
+    }
+
+    async function fetchActivities() {
+      const response = await fetch('http://localhost:4000/activities', {
+        method: 'GET',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const activities = await response.json();
+      const activitiesList = document.getElementById('activitiesList');
+      activitiesList.innerHTML = '';  // Clear previous entries
+
+      activities.forEach(activity => {
+        const item = document.createElement('li');
+        item.textContent = `${activity.title} - ${activity.description} - ${activity.date} - Created by: ${activity.creator}`;
+        activitiesList.appendChild(item);
+      });
     }
   </script>
 </head>
 <body>
   <h2>Login or Register</h2>
   <div>
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
     <div>
       <label><input type="radio" name="role" value="business" /> Business</label>
       <label><input type="radio" name="role" value="employee" /> Employee</label>
     </div>
     <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
+  </div>
+
+  <div id="activities" style="display:none;">
+    <h2>Activities</h2>
+    <ul id="activitiesList"></ul>
   </div>
 </body>
 </html>
