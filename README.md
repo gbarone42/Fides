@@ -31,29 +31,23 @@ These dependencies are automatically installed when running `npm install`.
 
 ### Step 1: Clone the Repository
 
-First, clone the repository to your local machine:
 
-```bash
-git clone <repository-url>
-cd <repository-folder>
-Usa il codice con cautela.
-
-Step 2: Set Up Docker
+Step: Set Up Docker
 The services are containerized with Docker, so you need Docker and Docker Compose to run them.
 
-Step 3: Running the Services
+Step: Running the Services
 To start the project services (login-service, activity-service, and PostgreSQL), run the following commands:
 
 Bash
 docker-compose up --build
-Usa il codice con cautela.
 
 This will build and start the following services:
 
 Login Service on port 3000
 Activity Service on port 4000
 PostgreSQL on port 5432
-Step 4: Accessing the Services
+
+Step : Accessing the Services
 Login Service:
 
 Register a user at http://localhost:3000/register
@@ -78,29 +72,24 @@ To enter the PostgreSQL container and interact with the database, run the follow
 
 Bash
 docker exec -it fides-postgres-1 psql -U postgres -d activities
-Usa il codice con cautela.
 
 Common PostgreSQL Queries:
 
 List all users:
 SQL
 SELECT * FROM users;
-Usa il codice con cautela.
 
 List all activities:
 SQL
 SELECT * FROM activities;
-Usa il codice con cautela.
 
 Delete all users:
 SQL
 DELETE FROM users;
-Usa il codice con cautela.
 
 Delete all activities:
 SQL
 DELETE FROM activities;
-Usa il codice con cautela.
 
 Drop and recreate users and activities table:
 SQL
@@ -120,20 +109,15 @@ CREATE TABLE activities (
     date DATE,
     user_id INTEGER REFERENCES users(id)
 );
-Usa il codice con cautela.
 
 Stopping and Restarting Services
 To stop the services:
 
-Bash
 docker-compose down
-Usa il codice con cautela.
 
 To restart the services after making changes:
 
-Bash
 docker-compose up --build
-Usa il codice con cautela.
 
 Troubleshooting
 Common Issues:
@@ -145,9 +129,8 @@ Clearing Docker Containers and Images:
 
 If you encounter errors with Docker, you can clear the containers and images:
 
-Bash
 docker-compose down --rmi all
-Usa il codice con cautela.
+
 
 This will remove all containers and images related to the project.
 
