@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const path = require('path');
 
@@ -16,37 +15,21 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Middleware for JWT authentication
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ message: 'Access token is missing' });
-  }
-
-  jwt.verify(token, 'secretKey', (err, user) => {
-    if (err) return res.status(403).json({ message: 'Invalid token' });
-    req.user = user;
-    next();
-  });
-}
-
-// Serve static HTML for activities
+// Serve the static HTML page for activities
 app.use('/web/activities', express.static(path.join(__dirname, 'public')));
 
-// Add a new activity
-app.post('/activities', authenticateToken, async (req, res) => {
-  const { title, description, date } = req.body;
+// Add a new activity (no authentication)
+app.post('/activities', async (req, res) => {
+  const { title, description, date, time, place } = req.body;
 
-  if (!title || !date) {
-    return res.status(400).json({ message: 'Title and date are required' });
+  if (!title || !date || !time || !place) {
+    return res.status(400).json({ message: 'Title, date, time, and place are required' });
   }
 
   try {
     await pool.query(
-      'INSERT INTO activities (title, description, date, user_id) VALUES ($1, $2, $3, $4)', 
-      [title, description, date, req.user.id]
+      'INSERT INTO activities (title, description, date, time, place) VALUES ($1, $2, $3, $4, $5)', 
+      [title, description, date, time, place]
     );
     res.status(201).json({ message: 'Activity created successfully' });
   } catch (err) {
@@ -54,11 +37,11 @@ app.post('/activities', authenticateToken, async (req, res) => {
   }
 });
 
-// Get all activities with creator's username
-app.get('/activities', authenticateToken, async (req, res) => {
+// Get all activities along with the creator (username)
+app.get('/activities', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT a.id, a.title, a.description, a.date, u.username AS creator
+      SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username AS creator
       FROM activities a
       JOIN users u ON a.user_id = u.id
     `);
@@ -69,7 +52,7 @@ app.get('/activities', authenticateToken, async (req, res) => {
 });
 
 // Delete an activity by ID
-app.delete('/activities/:id', authenticateToken, async (req, res) => {
+app.delete('/activities/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -86,12 +69,12 @@ app.delete('/activities/:id', authenticateToken, async (req, res) => {
 });
 
 // Search activities by title
-app.get('/activities/search', authenticateToken, async (req, res) => {
+app.get('/activities/search', async (req, res) => {
   const { title } = req.query;
 
   try {
     const result = await pool.query(
-      'SELECT a.id, a.title, a.description, a.date, u.username AS creator FROM activities a JOIN users u ON a.user_id = u.id WHERE a.title ILIKE $1', 
+      'SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username AS creator FROM activities a JOIN users u ON a.user_id = u.id WHERE a.title ILIKE $1', 
       [`%${title}%`]
     );
     res.status(200).json(result.rows);
