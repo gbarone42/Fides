@@ -17,7 +17,7 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Serve the login HTML
+// Serve the login page
 app.use('/web/login', express.static(path.join(__dirname, 'public')));
 
 app.post('/register', async (req, res) => {
@@ -54,7 +54,13 @@ app.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, 'secretKey', { expiresIn: '1h' });
-    res.json({ token });
+    
+    // Redirect based on user role
+    if (user.role === 'employee') {
+      res.json({ token, redirectTo: 'http://localhost:3000/web/login/employee' });
+    } else if (user.role === 'business') {
+      res.json({ token, redirectTo: 'http://localhost:3000/web/login/business' });
+    }
   } catch (err) {
     res.status(500).json({ message: 'Login failed', error: err.message });
   }

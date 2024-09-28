@@ -18,3 +18,11 @@ CREATE TABLE IF NOT EXISTS permissions (
   role VARCHAR(50) NOT NULL, -- 'business' o 'employee'
   permission VARCHAR(255) NOT NULL -- es: 'manage_employees'
 );
+
+CREATE TABLE IF NOT EXISTS availability (
+  id SERIAL PRIMARY KEY,
+  employee_id INTEGER REFERENCES users(id),
+  date DATE NOT NULL,
+  time TIME NOT NULL,
+  place VARCHAR(255) NOT NULL
+);
