@@ -18,18 +18,18 @@ const pool = new Pool({
 // Serve the static HTML page for activities
 app.use('/web/activities', express.static(path.join(__dirname, 'public')));
 
-// Add a new activity (no authentication)
+// Add a new activity (ensure user_id is passed from frontend)
 app.post('/activities', async (req, res) => {
-  const { title, description, date, time, place } = req.body;
+  const { title, description, date, time, place, user_id } = req.body;
 
-  if (!title || !date || !time || !place) {
-    return res.status(400).json({ message: 'Title, date, time, and place are required' });
+  if (!title || !date || !time || !place || !user_id) {
+    return res.status(400).json({ message: 'Title, date, time, place, and user_id are required' });
   }
 
   try {
     await pool.query(
-      'INSERT INTO activities (title, description, date, time, place) VALUES ($1, $2, $3, $4, $5)', 
-      [title, description, date, time, place]
+      'INSERT INTO activities (title, description, date, time, place, user_id) VALUES ($1, $2, $3, $4, $5, $6)', 
+      [title, description, date, time, place, user_id]
     );
     res.status(201).json({ message: 'Activity created successfully' });
   } catch (err) {
@@ -37,11 +37,11 @@ app.post('/activities', async (req, res) => {
   }
 });
 
-// Get all activities along with the creator (username)
+// Get all activities along with the creator (username and role)
 app.get('/activities', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username AS creator
+      SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username, u.role
       FROM activities a
       JOIN users u ON a.user_id = u.id
     `);
@@ -74,7 +74,7 @@ app.get('/activities/search', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username AS creator FROM activities a JOIN users u ON a.user_id = u.id WHERE a.title ILIKE $1', 
+      'SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username, u.role FROM activities a JOIN users u ON a.user_id = u.id WHERE a.title ILIKE $1', 
       [`%${title}%`]
     );
     res.status(200).json(result.rows);
