@@ -6,10 +6,8 @@
     <title>Employee Dashboard</title>
 </head>
 <body>
-    <h1>Employee Dashboard</h1>
+    <h1>Set Availability</h1>
 
-    <!-- Form for setting availability -->
-    <h2>Set Availability</h2>
     <form id="availability-form">
         <label for="date">Date:</label>
         <input type="date" id="date" name="date" required><br>
@@ -23,10 +21,24 @@
         <button type="submit">Set Availability</button>
     </form>
 
-    <div id="message"></div>
+    <h2>Availability List</h2>
+    <div id="availability-list"></div>
 
     <script>
-        let employeeId = '';  // You will retrieve this from the server after login
+        const employeeId = 1; // Replace with dynamic user id after login
+
+        async function fetchAvailability() {
+            const response = await fetch('http://localhost:3000/availability');
+            const availabilities = await response.json();
+            const availabilityList = document.getElementById('availability-list');
+            availabilityList.innerHTML = '';
+
+            availabilities.forEach(availability => {
+                const item = document.createElement('div');
+                item.textContent = `${availability.username} - ${availability.date} ${availability.time} at ${availability.place}`;
+                availabilityList.appendChild(item);
+            });
+        }
 
         document.getElementById('availability-form').addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -35,17 +47,19 @@
             const time = document.getElementById('time').value;
             const place = document.getElementById('place').value;
 
-            const response = await fetch('http://localhost:3000/availability', {
+            await fetch('http://localhost:3000/availability', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ employee_id: employeeId, date, time, place })
             });
 
-            const data = await response.json();
-            document.getElementById('message').textContent = data.message;
+            fetchAvailability(); // Refresh the availability list
         });
+
+        // Fetch availability on page load
+        fetchAvailability();
     </script>
 </body>
 </html>

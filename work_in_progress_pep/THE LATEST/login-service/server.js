@@ -1,9 +1,7 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const cors = require('cors');
-const path = require('path');
 const { Pool } = require('pg');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
@@ -17,52 +15,39 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Serve the login page
+// Serve the static HTML page for setting availability
 app.use('/web/login', express.static(path.join(__dirname, 'public')));
 
-app.post('/register', async (req, res) => {
-  const { username, password, role } = req.body;
+// Endpoint to set availability
+app.post('/availability', async (req, res) => {
+  const { employee_id, date, time, place } = req.body;
+
+  if (!employee_id || !date || !time || !place) {
+    return res.status(400).json({ message: 'Employee ID, date, time, and place are required' });
+  }
 
   try {
-    const existingUser = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query('INSERT INTO users (username, password, role) VALUES ($1, $2, $3)', [username, hashedPassword, role]);
-
-    res.status(201).json({ message: 'User registered successfully' });
+    await pool.query(
+      'INSERT INTO availability (employee_id, date, time, place) VALUES ($1, $2, $3, $4)', 
+      [employee_id, date, time, place]
+    );
+    res.status(201).json({ message: 'Availability set successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to register user', error: err.message });
+    res.status(500).json({ message: 'Failed to set availability', error: err.message });
   }
 });
 
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
+// Endpoint to get all availability for employees
+app.get('/availability', async (req, res) => {
   try {
-    const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-    if (userResult.rows.length === 0) {
-      return res.status(400).json({ message: 'User not found' });
-    }
-
-    const user = userResult.rows[0];
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ message: 'Invalid password' });
-    }
-
-    const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, 'secretKey', { expiresIn: '1h' });
-    
-    // Redirect based on user role
-    if (user.role === 'employee') {
-      res.json({ token, redirectTo: 'http://localhost:3000/web/login/employee' });
-    } else if (user.role === 'business') {
-      res.json({ token, redirectTo: 'http://localhost:3000/web/login/business' });
-    }
+    const result = await pool.query(`
+      SELECT a.id, a.date, a.time, a.place, u.username
+      FROM availability a
+      JOIN users u ON a.employee_id = u.id
+    `);
+    res.status(200).json(result.rows);
   } catch (err) {
-    res.status(500).json({ message: 'Login failed', error: err.message });
+    res.status(500).json({ message: 'Failed to retrieve availability', error: err.message });
   }
 });
 
