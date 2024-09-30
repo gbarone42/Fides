@@ -47,6 +47,15 @@ services:
       - DATABASE_URL=postgres://postgres:user@postgres:5432/activities
     networks:
       - fides_network
+ 
+  matching-service:
+    build: ./matching-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    networks:
+      - fides_network
 
 volumes:
   postgres_data:  # This volume ensures data persistence for PostgreSQL
