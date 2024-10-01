@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activities</title>
+  <script>
+    let token = null;
+
+    async function register() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const role = document.querySelector('input[name="role"]:checked').value;
+
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role })
+      });
+
+      const data = await response.json();
+      console.log(data);
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+      if (data.token) {
+        token = data.token;
+        document.getElementById('activities').style.display = 'block';
+        fetchActivities();
+      }
+    }
+
+    async function fetchActivities() {
+      const response = await fetch('http://localhost:4000/activities', {
+        method: 'GET',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const activities = await response.json();
+      const activitiesList = document.getElementById('activitiesList');
+      activitiesList.innerHTML = '';  // Clear previous entries
+
+      activities.forEach(activity => {
+        const item = document.createElement('li');
+        item.textContent = `${activity.title} - ${activity.description} - ${activity.date} - Created by: ${activity.creator}`;
+        activitiesList.appendChild(item);
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>Login or Register</h2>
+  <div>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <div>
+      <label><input type="radio" name="role" value="business" /> Business</label>
+      <label><input type="radio" name="role" value="employee" /> Employee</label>
+    </div>
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="activities" style="display:none;">
+    <h2>Activities</h2>
+    <ul id="activitiesList"></ul>
+  </div>
+</body>
+</html>
