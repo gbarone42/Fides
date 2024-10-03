@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Matching Results</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Activity Title</th>
+                    <th>Activity Date</th>
+                    <th>Activity Time</th>
+                    <th>Activity Place</th>
+                    <th>Employee</th>
+                    <th>Availability Date</th>
+                    <th>Availability Time</th>
+                    <th>Availability Place</th>
+                </tr>
+            </thead>
+            <tbody id="matches-list">
+                <!-- Matches will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchMatches() {
+            const response = await fetch('http://localhost:8081/matches');
+            const matches = await response.json();
+            const matchesList = document.getElementById('matches-list');
+
+            matches.forEach(match => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${match.activity_title}</td>
+                    <td>${new Date(match.activity_date).toLocaleDateString()}</td>
+                    <td>${match.activity_time}</td>
+                    <td>${match.activity_place}</td>
+                    <td>${match.employee}</td>
+                    <td>${new Date(match.availability_date).toLocaleDateString()}</td>
+                    <td>${match.availability_time}</td>
+                    <td>${match.availability_place}</td>
+                `;
+                matchesList.appendChild(row);
+            });
+        }
+
+        // Fetch and display matches when the page loads
+        fetchMatches();
+    </script>
+</body>
+</html>
