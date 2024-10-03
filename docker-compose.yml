@@ -26,8 +26,8 @@ services:
     networks:
       - fides_network
 
-  employee-dashboard:
-    build: ./employee-dashboard
+  login-service:
+    build: ./login-service
     ports:
       - "3000:3000"
     depends_on:
@@ -37,8 +37,8 @@ services:
     networks:
       - fides_network
 
-  business-dashboard:
-    build: ./business-dashboard
+  activity-service:
+    build: ./activity-service
     ports:
       - "4000:4000"
     depends_on:
