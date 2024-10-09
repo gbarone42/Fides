@@ -19,23 +19,31 @@ const pool = new Pool({
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve the register and login page
-app.get('/web/register', (req, res) => {
+// Serve the registration page
+app.get('/web/registrazione', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'registrazione.html'));
+});
+
+// Serve the login page
+app.get('/web/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Registration endpoint
 app.post('/register', async (req, res) => {
-  const { username, password, role } = req.body;
+  const { nome, cognome, dataDiNascita, email, username, password, accountType } = req.body;
 
   try {
-    const existingUser = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    const existingUser = await pool.query('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
     if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'User with this username or email already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query('INSERT INTO users (username, password, role) VALUES ($1, $2, $3)', [username, hashedPassword, role]);
+    await pool.query(
+      'INSERT INTO users (username, password, role, nome, cognome, data_di_nascita, email) VALUES ($1, $2, $3, $4, $5, $6, $7)', 
+      [username, hashedPassword, accountType, nome, cognome, dataDiNascita, email]
+    );
 
     res.status(201).json({ message: 'User registered successfully. Now, login!' });
   } catch (err) {

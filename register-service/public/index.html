@@ -1,66 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register & Login</title>
+    <title>"nome app" - Login</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Register & Login</h1>
+    <div class="container">
+        <h1 class="text-center my-5">"Nome dell'app"</h1>
+        <h5 class="text-center my-5">Accedi al tuo account o creane uno nuovo</h5>
+        
+        <form onsubmit="return login();" action="/login" method="POST">
+        </form>
+        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="Email" placeholder="Inserisci la tua Email" required>
+            </div>
 
-    <!-- Register Section -->
-    <div id="register-section">
-        <h2>Register</h2>
-        <input type="text" id="reg-username" placeholder="Username"><br>
-        <input type="password" id="reg-password" placeholder="Password"><br>
-        <label><input type="radio" name="role" value="business"> Business</label>
-        <label><input type="radio" name="role" value="employee"> Employee</label><br>
-        <button onclick="register()">Register</button>
-        <p id="register-message"></p>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Inserisci la tua password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Accedi</button>
+            <a href="registrazione.html" class="btn btn-transparent">Registrati</a>
+        </form>
     </div>
-
-    <!-- Login Section -->
-    <div id="login-section">
-        <h2>Login</h2>
-        <input type="text" id="login-username" placeholder="Username"><br>
-        <input type="password" id="login-password" placeholder="Password"><br>
-        <button onclick="login()">Login</button>
-        <p id="login-message"></p>
-    </div>
-
+    
     <script>
-        async function register() {
-            const username = document.getElementById('reg-username').value;
-            const password = document.getElementById('reg-password').value;
-            const role = document.querySelector('input[name="role"]:checked').value;
+        function login() {
+            const username = document.getElementById('Email').value;
+            const password = document.getElementById('password').value;
 
-            const response = await fetch('http://localhost:5000/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, role })
-            });
-
-            const data = await response.json();
-            document.getElementById('register-message').innerText = data.message;
-        }
-
-        async function login() {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-
-            const response = await fetch('http://localhost:5000/login', {
+            fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirectTo) {
+                    window.location.href = data.redirectTo;
+                } else {
+                    alert(data.message);
+                }
             });
 
-            const data = await response.json();
-            if (data.redirectTo) {
-                window.location.href = data.redirectTo;  // Redirect to the appropriate page
-            } else {
-                document.getElementById('login-message').innerText = data.message;
-            }
+            return false;
         }
     </script>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
