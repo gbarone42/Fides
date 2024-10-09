@@ -45,7 +45,7 @@ app.post('/register', async (req, res) => {
       [username, hashedPassword, accountType, nome, cognome, dataDiNascita, email]
     );
 
-    res.status(201).json({ message: 'User registered successfully. Now, login!' });
+    res.status(201).json({ message: 'User registered successfully', role: accountType });
   } catch (err) {
     res.status(500).json({ message: 'Failed to register user', error: err.message });
   }
