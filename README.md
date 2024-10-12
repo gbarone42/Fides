@@ -1,158 +1,178 @@
-Markdown
-# Activity & Login Service Project
+# README.md
 
-## Project Overview
+## Docker Commands
 
-This project consists of two services:
-
-1. **Login Service**: A service to register and login users.
-2. **Activity Service**: A service that allows users to create, view, update, and delete activities.
-
-## Dependencies
-
-Make sure the following dependencies are installed before running the project:
-
-### System Requirements
-
-* **Docker**: Install Docker for container management.
-* **Docker Compose**: Install Docker Compose to run the services together.
-* **PostgreSQL**: The project uses PostgreSQL as the database for storing users and activities.
-
-### Node.js Dependencies
-
-* **Express**: For building the REST API.
-* **jsonwebtoken**: For managing JWT tokens for authentication.
-* **bcryptjs**: For hashing user passwords.
-* **pg**: For interacting with PostgreSQL.
-
-These dependencies are automatically installed when running `npm install`.
-
-## How to Set Up and Run the Project
-
-### Step 1: Clone the Repository
-
-First, clone the repository to your local machine:
-
+### List Running Containers
 ```bash
-git clone <repository-url>
-cd <repository-folder>
-Usa il codice con cautela.
+# Lists all running Docker containers
+docker ps
+```
 
-Step 2: Set Up Docker
-The services are containerized with Docker, so you need Docker and Docker Compose to run them.
+### Start All Services
+```bash
+# Starts all services defined in your docker-compose.yml file
+docker-compose up
+```
 
-Step 3: Running the Services
-To start the project services (login-service, activity-service, and PostgreSQL), run the following commands:
-
-Bash
+### Build and Start Containers
+```bash
+# Builds the images before starting the containers
 docker-compose up --build
-Usa il codice con cautela.
+```
 
-This will build and start the following services:
-
-Login Service on port 3000
-Activity Service on port 4000
-PostgreSQL on port 5432
-Step 4: Accessing the Services
-Login Service:
-
-Register a user at http://localhost:3000/register
-Login at http://localhost:3000/login
-You will receive a JWT token upon login.
-Activity Service:
-
-Create, view, update, and delete activities at http://localhost:4000/web/activities
-You can either use the JWT Token to authenticate or the username and password via the UI.
-Step 5: Environment Variables
-Make sure that the .env file is correctly configured with the following details (if needed):
-
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=user
-POSTGRES_DB=activities
-NODE_ENV=development
-JWT_SECRET=secretKey
-Basic PostgreSQL Commands
-Connecting to PostgreSQL via Docker
-
-To enter the PostgreSQL container and interact with the database, run the following command:
-
-Bash
-docker exec -it fides-postgres-1 psql -U postgres -d activities
-Usa il codice con cautela.
-
-Common PostgreSQL Queries:
-
-List all users:
-SQL
-SELECT * FROM users;
-Usa il codice con cautela.
-
-List all activities:
-SQL
-SELECT * FROM activities;
-Usa il codice con cautela.
-
-Delete all users:
-SQL
-DELETE FROM users;
-Usa il codice con cautela.
-
-Delete all activities:
-SQL
-DELETE FROM activities;
-Usa il codice con cautela.
-
-Drop and recreate users and activities table:
-SQL
-DROP TABLE users;
-DROP TABLE activities;
-
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE,
-    password TEXT
-);
-
-CREATE TABLE activities (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255),
-    description TEXT,
-    date DATE,
-    user_id INTEGER REFERENCES users(id)
-);
-Usa il codice con cautela.
-
-Stopping and Restarting Services
-To stop the services:
-
-Bash
+### Stop and Remove Containers
+```bash
+# Stops and removes all containers defined in your docker-compose.yml file
 docker-compose down
-Usa il codice con cautela.
+```
 
-To restart the services after making changes:
+### Stop, Remove Containers and Volumes
+```bash
+# Stops and removes containers and associated volumes
+docker-compose down --volumes
+```
 
-Bash
-docker-compose up --build
-Usa il codice con cautela.
+### Rebuild and Restart Containers
+```bash
+# Stops and removes containers, then rebuilds and starts them
+docker-compose down && docker-compose up --build
+```
 
-Troubleshooting
-Common Issues:
+### Access PostgreSQL Database
+```bash
+# Opens an interactive terminal session in the fides-postgres-1 container to the PostgreSQL database
+docker exec -it fides-postgres-1 psql -U postgres -d activities
+```
 
-CORS Policy Errors: Ensure that the CORS configuration is enabled in the backend (login-service and activity-service) by setting appropriate headers.
-JWT Token Expiration: Tokens are valid for a limited time (typically 1 hour). If a token expires, you must log in again to obtain a new token.
-Database Not Connecting: Ensure that PostgreSQL is running and accepting connections on port 5432. Verify the docker-compose.yml and .env file for correct credentials.
-Clearing Docker Containers and Images:
+## API Calls with cURL
 
-If you encounter errors with Docker, you can clear the containers and images:
+### Register New User
+```bash
+# Sends a POST request to register a new user
+curl -X POST http://localhost:3000/register -H "Content-Type: application/json" -d '{"username": "testuser", "password": "testpassword"}'
+```
 
-Bash
-docker-compose down --rmi all
-Usa il codice con cautela.
+### Register New Employee User
+```bash
+# Sends a POST request to register a new user with a specific role
+curl -X POST http://localhost:5000/register -H "Content-Type: application/json" -d '{"username": "newuser", "password": "password", "role": "employee"}'
+```
 
-This will remove all containers and images related to the project.
+### Add New Activity
+```bash
+# Sends a POST request to add a new activity
+curl -X POST http://localhost:4000/activities -H "Content-Type: application/json" -d '{"title": "Test Activity", "description": "A test", "date": "2024-09-30", "time": "10:00:00", "place": "Office", "user_id": 1}'
+```
 
-License
-This project is licensed under the MIT License.
+## SQL Commands
 
+### Delete All Activities
+```sql
+-- Deletes all records from the activities table
+DELETE FROM activities;
+```
 
-This formatted content includes proper code blocks for commands and SQL queries, making it easier to read and follow the instructions. 
+### Delete Activities for a Specific User
+```sql
+-- Deletes activities associated with a specific user
+DELETE FROM activities WHERE user_id = 3;
+```
+
+### Delete All Users
+```sql
+-- Deletes all records from the users table
+DELETE FROM users;
+```
+
+### Delete Specific User
+```sql
+-- Deletes a specific user from the users table
+DELETE FROM users WHERE id = 3;
+```
+
+### View All Users
+```sql
+-- Retrieves all records from the users table
+SELECT * FROM users;
+```
+
+### View All Activities
+```sql
+-- Retrieves all records from the activities table
+SELECT * FROM activities;
+```
+
+### View All Permissions
+```sql
+-- Retrieves all records from the permissions table
+SELECT * FROM permissions;
+```
+
+### View All Availability
+```sql
+-- Retrieves all records from the availability table
+SELECT * FROM availability;
+```
+
+### Join Activities and Users
+```sql
+-- Joins the activities and users tables to get a comprehensive view of activities with associated usernames
+SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username FROM activities a JOIN users u ON a.user_id = u.id;
+```
+
+### Join Availability and Users
+```sql
+-- Joins the availability and users tables to view availability linked to usernames
+SELECT a.id, a.date, a.time, a.place, u.username FROM availability a JOIN users u ON a.employee_id = u.id;
+```
+
+### View Date, Time, and Place of All Activities
+```sql
+-- Retrieves date, time, and place of all activities
+SELECT date, time, place FROM activities;
+```
+
+### View Date, Time, and Place of All Availabilities
+```sql
+-- Retrieves date, time, and place of all availabilities
+SELECT date, time, place FROM availability;
+```
+
+### Reset User ID Sequence
+```sql
+-- Resets the sequence for user IDs to start from 1
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+```
+
+### Reset Activity ID Sequence
+```sql
+-- Resets the sequence for activity IDs to start from 1
+ALTER SEQUENCE activities_id_seq RESTART WITH 1;
+```
+
+## System Commands
+
+### List Processes Using PostgreSQL Port
+```bash
+# Lists processes using port 5432 (the default PostgreSQL port)
+sudo lsof -i :5432
+```
+
+### Kill a Process
+```bash
+# Terminates a process identified by its process ID (pid)
+sudo kill pid
+```
+
+### Stop PostgreSQL Service
+```bash
+# Stops the PostgreSQL service
+sudo systemctl stop postgresql
+```
+
+## Node.js Package Installation
+
+### Install jsonwebtoken
+```bash
+# Installs the jsonwebtoken library
+npm install jsonwebtoken
