@@ -176,3 +176,20 @@ sudo systemctl stop postgresql
 ```bash
 # Installs the jsonwebtoken library
 npm install jsonwebtoken
+
+
+### LINKS
+```bash
+http://localhost:3000/web/login/ //EmployeeDashboard
+
+```bash
+http://localhost:4000/web/activities/ //BusinessDashboard
+
+```bash
+http://localhost:5000/web/registrazione //Registrazione
+
+```bash
+http://localhost:5000/web/login //Login
+
+```bash
+http://localhost:8081/matches //Matching
