@@ -6,7 +6,9 @@ const path = require('path');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: '*' /* ['http://localhost:3000', 'http://localhost:4000'] */
+}));
 
 const pool = new Pool({
   user: 'postgres',
@@ -16,16 +18,20 @@ const pool = new Pool({
   port: 5432,
 });
 
+console.log('REGISTER-SERVICE');
+
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve the registration page
 app.get('/web/registrazione', (req, res) => {
+  console.log('Serving registrazione.html');
   res.sendFile(path.join(__dirname, 'public', 'registrazione.html'));
 });
 
 // Serve the login page
 app.get('/web/login', (req, res) => {
+  console.log('Serving index.html');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

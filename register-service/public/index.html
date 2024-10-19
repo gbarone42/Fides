@@ -25,14 +25,18 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Accedi</button>
-            <a href="registrazione.html" class="btn btn-transparent">Registrati</a>
+            <a href="/web/registrazione" class="btn btn-transparent">Registrati</a>
         </form>
     </div>
     
     <script>
         function login() {
+            event.preventDefault();
+            console.log('function login()');
+
             const username = document.getElementById('Email').value;
             const password = document.getElementById('password').value;
+            
 
             fetch('/login', {
                 method: 'POST',
