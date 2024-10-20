@@ -12,8 +12,6 @@
         <h5 class="text-center my-5">Accedi al tuo account o creane uno nuovo</h5>
         
         <form onsubmit="return login();" action="/login" method="POST">
-        </form>
-        
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="Email" placeholder="Inserisci la tua Email" required>
@@ -29,11 +27,11 @@
         </form>
     </div>
     
+    
+</body>
+
     <script>
         function login() {
-            event.preventDefault();
-            console.log('function login()');
-
             const username = document.getElementById('Email').value;
             const password = document.getElementById('password').value;
             
@@ -45,8 +43,9 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.redirectTo) {
-                    window.location.href = data.redirectTo;
+                if (data.token) {
+                    console.log('Received JWT:', data.token); 
+                    // window.location.href = data.redirectTo;
                 } else {
                     alert(data.message);
                 }
@@ -57,5 +56,4 @@
     </script>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
-</body>
 </html>

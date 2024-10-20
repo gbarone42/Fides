@@ -18,8 +18,6 @@ const pool = new Pool({
   port: 5432,
 });
 
-console.log('REGISTER-SERVICE');
-
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -61,6 +59,8 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
+  console.log('REGISTER-SERVICE');
+
   try {
     const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     if (userResult.rows.length === 0) {
@@ -72,6 +72,15 @@ app.post('/login', async (req, res) => {
     if (!validPassword) {
       return res.status(400).json({ message: 'Invalid password' });
     }
+
+    // User authenticated, create a JWT token
+    const payload = { id: user.id, username: user.username };
+    
+    // Sign the JWT token (usually with a secret or private key)
+    const token = jwt.sign(payload, 'your-secret-key', { expiresIn: '1h' });  // Token expires in 1 hour
+
+    // Send the token back to the user
+    res.json({ token });
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 'http://localhost:4000/web/activities/' : 'http://localhost:3000/web/login/';
