@@ -1,9 +1,12 @@
+/* Libraries */
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
+
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads the .env file
 
 const app = express();
 app.use(express.json());
@@ -91,8 +94,10 @@ app.post('/login', async (req, res) => {
     // User authenticated, create a JWT token
     const payload = { id: user.id, username: user.email };
     
-    // Sign the JWT token (usually with a secret or private key)
-    const token = jwt.sign(payload, 'your-secret-key', { expiresIn: '1h' });  // Token expires in 1 hour
+    // Sign the JWT token with the secret key from the .env file
+    const secretKey = process.env.SECRET_KEY;
+    console.log('My secret jwt key is: ${secretKey}');
+    const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });  // Token expires in 1 hour
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 'http://localhost:4000/web/activities/' : 'http://localhost:3000/web/login/';
