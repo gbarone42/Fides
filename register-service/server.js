@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
@@ -10,11 +11,21 @@ app.use(cors({
   origin: '*' /* ['http://localhost:3000', 'http://localhost:4000'] */
 }));
 
-const pool = new Pool({
-  user: 'postgres',
-  host: 'postgres',
+// DB Docker connection
+/* const pool = new Pool({
+  user: 'ulissecolla',
+  host: 'localhost',
   database: 'activities',
   password: 'user',
+  port: 5432,
+}); */
+
+// DB local connection
+const pool = new Pool({
+  user: 'ulissecolla',
+  host: 'localhost',
+  database: 'activities',
+  password: '',
   port: 5432,
 });
 
@@ -57,35 +68,37 @@ app.post('/register', async (req, res) => {
 
 // Login endpoint
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  console.log('REGISTER-SERVICE');
+  const { email, password } = req.body;
+  console.log({ email, password });
 
   try {
-    const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    //Query for the user
+    const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userResult.rows.length === 0) {
       return res.status(400).json({ message: 'User not found' });
     }
 
+    //Check the PW
     const user = userResult.rows[0];
+    /* console.log({userResult}) */
     const validPassword = await bcrypt.compare(password, user.password);
+    console.log('Password valid: ', validPassword);
     if (!validPassword) {
       return res.status(400).json({ message: 'Invalid password' });
     }
 
+    //Create JWT
     // User authenticated, create a JWT token
-    const payload = { id: user.id, username: user.username };
+    const payload = { id: user.id, username: user.email };
     
     // Sign the JWT token (usually with a secret or private key)
     const token = jwt.sign(payload, 'your-secret-key', { expiresIn: '1h' });  // Token expires in 1 hour
 
-    // Send the token back to the user
-    res.json({ token });
-
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 'http://localhost:4000/web/activities/' : 'http://localhost:3000/web/login/';
-    res.json({ message: 'Login successful', redirectTo });
+    res.json({ token, message: 'Login successful', redirectTo });
   } catch (err) {
+    console.error('Login failed:', err);  // Log the actual error for debugging
     res.status(500).json({ message: 'Login failed', error: err.message });
   }
 });

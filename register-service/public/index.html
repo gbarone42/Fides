@@ -32,20 +32,20 @@
 
     <script>
         function login() {
-            const username = document.getElementById('Email').value;
+            const email = document.getElementById('Email').value;
             const password = document.getElementById('password').value;
             
 
             fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ email, password })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.token) {
                     console.log('Received JWT:', data.token); 
-                    // window.location.href = data.redirectTo;
+                    window.location.href = data.redirectTo;
                 } else {
                     alert(data.message);
                 }

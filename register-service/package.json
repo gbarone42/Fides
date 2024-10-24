@@ -7,13 +7,19 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": ["register", "users", "microservice", "authentication"],
+  "keywords": [
+    "register",
+    "users",
+    "microservice",
+    "authentication"
+  ],
   "author": "Your Name or Organization",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.0"
   }
 }
