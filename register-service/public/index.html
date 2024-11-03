@@ -62,10 +62,14 @@
         .then(response => response.json())
         .then(data => {
             if (data.token) {
-                console.log('Received JWT:', data.token);
+                logToFile('Login -- Received JWT:');
+                logToFile(data.token);
+
                 const tokenData = parseJwt(data.token);
-                logToFile('Token data is:');
+
+                logToFile('Login -- Token data is:');
                 logToFile({tokenData});
+                
                 localStorage.setItem('token', data.token);
                 window.location.href = data.redirectTo;
             } else {

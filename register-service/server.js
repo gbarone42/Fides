@@ -110,9 +110,16 @@ app.post('/login', async (req, res) => {
     
     // Sign the JWT token with the secret key from the .env file
     const secretKey = process.env.SECRET_KEY;
-    console.log('My secret jwt key is: ');
-    console.log(secretKey);
+    // console.log('My secret jwt key is: ');
+    // console.log(secretKey);
     const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });  // Token expires in 1 hour
+
+    // Set the JWT as an HttpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,    // Prevents JavaScript access
+      secure: process.env.NODE_ENV === 'production', // Ensures secure cookie in production
+      maxAge: 3600000    // 1 hour expiration
+    });
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 'http://localhost:4000/web/activities/' : 'http://localhost:3000/web/login/';

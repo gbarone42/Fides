@@ -48,27 +48,27 @@
         console.log('Token taken');
 
         if (!token) {
-        console.log('Token not found');
-        // Redirect to login page if not authenticated
-        window.location.href = 'http://localhost:5000/web/login/';
+            console.log('Token not found');
+            // Redirect to login page if not authenticated
+            window.location.href = 'http://localhost:5000/web/login/';
         } else {
-        logToFile({token});
-        // Fetch data from the dashboard API
-        fetch('/activities', {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        .then(response => {
-            if (!response.ok) {
-            window.location.href = 'http://localhost:5000/web/login/'; // Redirect if unauthorized
-            }
-            return response.json();
-        })
-        .then(data => {
-            logToFile('Dashboard data: '); // Handle data in dashboard
-            logToFile(data);
-        })
-        .catch(error => console.error('Error fetching dashboard data:', error));
+            logToFile({token});
+            // Fetch data from the dashboard API
+            fetch('/activities', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => {
+                if (!response.ok) {
+                window.location.href = 'http://localhost:5000/web/login/'; // Redirect if unauthorized
+                }
+                return response.json();
+            })
+            .then(data => {
+                logToFile('Dashboard data: '); // Handle data in dashboard
+                logToFile(data);
+            })
+            .catch(error => console.error('Error fetching dashboard data:', error));
         }
 
         /* AVAILABILITY */
