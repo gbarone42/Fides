@@ -173,9 +173,32 @@ sudo systemctl stop postgresql
 ## Node.js Package Installation
 
 ### Install jsonwebtoken
+Necessary to create and use the JWT
 ```bash
 # Installs the jsonwebtoken library
 npm install jsonwebtoken
+```
+
+### Install dotnev
+Package to load a .env file to the process.env of the App
+```bash
+# Installs the dotenv package
+npm install dotenv
+```
+
+### Install Nodemon
+Tool to observe changes in the files and relaunch the servers automatically
+```bash
+# Installs the dotenv package
+npm install nodemon
+```
+
+## Run the App in local without launching Docker-compose
+
+Make sure you have the above Node.js packages and libraries installed. Run the start_servers.sh:
+```bash
+# Installs the dotenv package
+bash start_servers.sh
 ```
 
 ### LINKS

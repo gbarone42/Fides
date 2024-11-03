@@ -25,7 +25,55 @@
     <div id="availability-list"></div>
 
     <script>
-        const employeeId = 1; // Replace with dynamic user id after login
+        function logToFile(message) {
+            fetch('/log', { // This is a hypothetical endpoint you'll need to set up server-side
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        }
+
+        // Check if token exists in localStorage or sessionStorage
+        const token = localStorage.getItem('token'); // or sessionStorage.getItem('token')
+        console.log('Token taken');
+
+        if (!token) {
+        console.log('Token not found');
+        // Redirect to login page if not authenticated
+        window.location.href = 'http://localhost:5000/web/login/';
+        } else {
+        logToFile({token});
+        // Fetch data from the dashboard API
+        fetch('/activities', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(response => {
+            if (!response.ok) {
+            window.location.href = 'http://localhost:5000/web/login/'; // Redirect if unauthorized
+            }
+            return response.json();
+        })
+        .then(data => {
+            logToFile('Dashboard data: '); // Handle data in dashboard
+            logToFile(data);
+        })
+        .catch(error => console.error('Error fetching dashboard data:', error));
+        }
+
+        /* AVAILABILITY */
+        const tokenData = parseJwt(token);
+        const employeeId = tokenData.id; // Replace with dynamic user id after login
 
         async function fetchAvailability() {
             const response = await fetch('http://localhost:3000/availability');
@@ -60,6 +108,7 @@
 
         // Fetch availability on page load
         fetchAvailability();
+
     </script>
 </body>
 </html>

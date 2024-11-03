@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
+const fs = require('fs');
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads the .env file
 
@@ -34,6 +35,19 @@ const pool = new Pool({
 
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// debugging end point
+app.post('/log', (req, res) => {
+  const { message } = req.body;
+  
+  fs.appendFile('log.txt', message + '\n', (err) => {
+      if (err) {
+          console.error('Error writing to log file:', err);
+          return res.status(500).send('Failed to log message');
+      }
+      res.status(200).send('Message logged successfully');
+  });
+});
 
 // Serve the registration page
 app.get('/web/registrazione', (req, res) => {
@@ -96,7 +110,8 @@ app.post('/login', async (req, res) => {
     
     // Sign the JWT token with the secret key from the .env file
     const secretKey = process.env.SECRET_KEY;
-    console.log('My secret jwt key is: ${secretKey}');
+    console.log('My secret jwt key is: ');
+    console.log(secretKey);
     const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });  // Token expires in 1 hour
 
     // Redirect based on role
