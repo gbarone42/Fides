@@ -1,3 +1,4 @@
+
 # Array of directories
 directories=(
   "./register-service"

@@ -116,14 +116,15 @@ app.post('/login', async (req, res) => {
 
     // Set the JWT as an HttpOnly cookie
     res.cookie('token', token, {
-      httpOnly: true,    // Prevents JavaScript access
-      secure: process.env.NODE_ENV === 'production', // Ensures secure cookie in production
-      maxAge: 3600000    // 1 hour expiration
+      httpOnly: true,                   // Prevents JavaScript access
+      secure: true,                     // Ensures secure cookie in production
+      sameSite: 'None',                 // Allows cross-origin requests with the cookie
+      maxAge: 3600000                   // 1 hour expiration
     });
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 'http://localhost:4000/web/activities/' : 'http://localhost:3000/web/login/';
-    res.json({ token, message: 'Login successful', redirectTo });
+    res.json({ message: 'Login successful', redirectTo });
   } catch (err) {
     console.error('Login failed:', err);  // Log the actual error for debugging
     res.status(500).json({ message: 'Login failed', error: err.message });

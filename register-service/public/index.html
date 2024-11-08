@@ -33,7 +33,7 @@
 <script>
 
     function logToFile(message) {
-        fetch('/log', { // This is a hypothetical endpoint you'll need to set up server-side
+        fetch('/log', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message })
@@ -61,18 +61,13 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.token) {
-                logToFile('Login -- Received JWT:');
-                logToFile(data.token);
-
-                const tokenData = parseJwt(data.token);
-
-                logToFile('Login -- Token data is:');
-                logToFile({tokenData});
-                
-                localStorage.setItem('token', data.token);
+            if (data.message === 'Login successful') {
+                console.log('Login successful');
                 window.location.href = data.redirectTo;
-            } else {
+            }
+            else
+            {
+                console.log('login not working');
                 alert(data.message);
             }
         });

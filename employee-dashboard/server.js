@@ -24,24 +24,32 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Middleware function: checks if there is a JWT and, if yes, it checks its validity
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return res.sendStatus(401); // No token, unauthorized
+// Middleware function: checks if there is a JWT and, if yes, it checks its validity
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+function authenticateJWT(req, res, next) {
+  const token = req.cookies.token; // Read the token from the cookie
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
-    if (err) return res.sendStatus(403); // Invalid token, forbidden
-    req.user = user; // Attach user info to request
+    if (err) {
+      return res.status(403).json({ message: 'Token is not valid' });
+    }
+
+    req.user = user; // Store the user information for use in other routes
     next();
   });
 }
 
-console.log('EMPLOYEE-DASHBOARD');
 
 // Serve the static HTML page for setting availability
 app.use('/web/login', express.static(path.join(__dirname, 'public')));
+
 
 // debugging end point
 app.post('/log', (req, res) => {
@@ -55,6 +63,7 @@ app.post('/log', (req, res) => {
       res.status(200).send('Message logged successfully');
   });
 });
+
 
 // Endpoint to set availability
 app.post('/availability', async (req, res) => {
@@ -75,6 +84,7 @@ app.post('/availability', async (req, res) => {
   }
 });
 
+
 // Endpoint to get all availability for employees
 app.get('/availability', /* authenticateToken, */ async (req, res) => {
   try {
@@ -88,6 +98,7 @@ app.get('/availability', /* authenticateToken, */ async (req, res) => {
     res.status(500).json({ message: 'Failed to retrieve availability', error: err.message });
   }
 });
+
 
 app.listen(3000, () => {
   console.log('Login service running on port 3000');
