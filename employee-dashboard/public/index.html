@@ -43,10 +43,6 @@
             return JSON.parse(jsonPayload);
         }
 
-        // Check if token exists in localStorage or sessionStorage
-        const token = localStorage.getItem('token'); // or sessionStorage.getItem('token')
-        console.log('Token taken');
-
         fetch('http://localhost:4000/activities', {
             method: 'GET',
             credentials: 'include', // Sends cookies with the request

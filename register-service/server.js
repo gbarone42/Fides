@@ -57,7 +57,6 @@ app.get('/web/registrazione', (req, res) => {
 
 // Serve the login page
 app.get('/web/login', (req, res) => {
-  console.log('Serving index.html');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -123,7 +122,9 @@ app.post('/login', async (req, res) => {
     });
 
     // Redirect based on role
-    const redirectTo = user.role === 'business' ? 'http://localhost:4000/web/activities/' : 'http://localhost:3000/web/login/';
+    const redirectTo = user.role === 'business' ? 
+      'http://localhost:4000/web/activities/' : 
+      'http://localhost:3000/web/login/';
     res.json({ message: 'Login successful', redirectTo });
   } catch (err) {
     console.error('Login failed:', err);  // Log the actual error for debugging

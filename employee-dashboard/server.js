@@ -4,6 +4,8 @@ const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(cors());
 
@@ -24,10 +26,10 @@ const pool = new Pool({
   port: 5432,
 });
 
-
-// Middleware function: checks if there is a JWT and, if yes, it checks its validity
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
+app.use(cors({
+    origin: ['http://localhost:4000', 'http://localhost:3000'],
+    credentials: true
+}));
 
 function authenticateJWT(req, res, next) {
   const token = req.cookies.token; // Read the token from the cookie
@@ -46,10 +48,12 @@ function authenticateJWT(req, res, next) {
   });
 }
 
-
 // Serve the static HTML page for setting availability
 app.use('/web/login', express.static(path.join(__dirname, 'public')));
 
+app.get('/web/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // debugging end point
 app.post('/log', (req, res) => {
