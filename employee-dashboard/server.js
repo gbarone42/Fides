@@ -11,7 +11,11 @@ const fs = require('fs');
 const config = require('@app_config/shared');
 const { authenticateToken, protectedRoute } = config.authMiddleware;  // Destructure the middleware
 
+console.log('Middleware loaded:', !!authenticateToken);
+
 const app = express();
+
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads the .env file
 
 // Middleware
 app.use(cookieParser());
@@ -36,15 +40,35 @@ const pool = new Pool({
 });
 
 app.use(cors({
-    origin: [config.services.LOGIN, config.services.EMPLOYEE_DASHBOARD],
-    credentials: true
+    origin: [config.services.EMPLOYEE_DASHBOARD, config.services.BUSINESS_DASHBOARD, config.services.LOGIN],
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 
 // Serve the static HTML page for setting availability
-app.use('/activities', express.static(path.join(__dirname, 'public')));
-app.get('/activities', authenticateToken, protectedRoute, (req, res) => {
+app.use('/employee_dashboard', express.static(path.join(__dirname, 'public')));
+app.get('/employee_dashboard', authenticateToken, protectedRoute, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+
+// serve the user ID
+app.get('/api/employee_dashboard', authenticateToken, protectedRoute, async (req, res) => {
+  try {
+      // Send JSON data instead of HTML
+      res.json({
+        user: {
+          id: req.user.id,
+          email: req.user.username,
+          role: req.user.role
+        },
+      });
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ message: 'Error fetching activities' });
+  }
 });
 
 

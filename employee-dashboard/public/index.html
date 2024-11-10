@@ -36,30 +36,40 @@
             return JSON.parse(jsonPayload);
         } */
 
-        fetch('http://localhost:3000/activities', {
-            method: 'GET',
-            credentials: 'include', // Sends cookies with the request
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                window.location.href = 'http://localhost:5000/web/login/';
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Dashboard data:', data);
-        })
-        .catch(error => console.error('Error fetching dashboard data:', error));
+
+        // Wait for page load before fetching data
+        document.addEventListener('DOMContentLoaded', function() {
+
+            fetch('http://localhost:3000/api/employee_dashboard', {
+                method: 'GET',
+                credentials: 'include', // Sends cookies with the request
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('Dashboard response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    throw new Error('Not authenticated');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const userId = data.user.id;  // Get user ID from the response
+                console.log('User ID:', userId);
+                // Use userId here
+            })
+            .catch(error => console.error('Error fetching dashboard data:', error));
+
+        });
 
 
         /* AVAILABILITY */
-        const employeeId = req.user.id; // Replace with dynamic user id after login
-        console.log('User ID: ', employeeId);
+        // console.log('User ID: ', userId);
 
-        async function fetchAvailability() {
+        /* async function fetchAvailability() {
             const response = await fetch('http://localhost:3000/availability');
             const availabilities = await response.json();
             const availabilityList = document.getElementById('availability-list');
@@ -91,7 +101,7 @@
         });
 
         // Fetch availability on page load
-        fetchAvailability();
+        fetchAvailability(); */
 
         /* Old version of checking the jwt */
         /* if (!token) {
