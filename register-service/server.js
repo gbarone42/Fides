@@ -2,10 +2,13 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
+
+const config = require('@app_config/shared');
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads the .env file
 
@@ -36,18 +39,6 @@ const pool = new Pool({
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// debugging end point
-app.post('/log', (req, res) => {
-  const { message } = req.body;
-  
-  fs.appendFile('log.txt', message + '\n', (err) => {
-      if (err) {
-          console.error('Error writing to log file:', err);
-          return res.status(500).send('Failed to log message');
-      }
-      res.status(200).send('Message logged successfully');
-  });
-});
 
 // Serve the registration page
 app.get('/web/registrazione', (req, res) => {
@@ -55,10 +46,12 @@ app.get('/web/registrazione', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'registrazione.html'));
 });
 
+
 // Serve the login page
 app.get('/web/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 
 // Registration endpoint
 app.post('/register', async (req, res) => {
@@ -82,10 +75,11 @@ app.post('/register', async (req, res) => {
   }
 });
 
+
 // Login endpoint
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log({ email, password });
+  console.log('Login attempt for:', { email, password });
 
   try {
     //Query for the user
@@ -96,21 +90,17 @@ app.post('/login', async (req, res) => {
 
     //Check the PW
     const user = userResult.rows[0];
-    /* console.log({userResult}) */
     const validPassword = await bcrypt.compare(password, user.password);
     console.log('Password valid: ', validPassword);
     if (!validPassword) {
       return res.status(400).json({ message: 'Invalid password' });
     }
 
-    //Create JWT
     // User authenticated, create a JWT token
     const payload = { id: user.id, username: user.email };
     
     // Sign the JWT token with the secret key from the .env file
     const secretKey = process.env.SECRET_KEY;
-    // console.log('My secret jwt key is: ');
-    // console.log(secretKey);
     const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });  // Token expires in 1 hour
 
     // Set the JWT as an HttpOnly cookie
@@ -123,14 +113,25 @@ app.post('/login', async (req, res) => {
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 
-      'http://localhost:4000/web/activities/' : 
-      'http://localhost:3000/web/login/';
+      config.services.BUSINESS_DASHBOARD : 
+      config.services.EMPLOYEE_DASHBOARD ;
     res.json({ message: 'Login successful', redirectTo });
   } catch (err) {
     console.error('Login failed:', err);  // Log the actual error for debugging
     res.status(500).json({ message: 'Login failed', error: err.message });
   }
 });
+
+
+// Logout - TODO
+/* app.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.json({ 
+    message: 'Logged out successfully',
+    redirectTo: '/login'
+  });
+}); */
+
 
 app.listen(5000, () => {
   console.log('Register and Login service running on port 5000');

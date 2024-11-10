@@ -1,7 +1,9 @@
-const express = require('express');
+/* const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-const path = require('path');
+const path = require('path'); */
+
+const config = require('@app_config/shared/config');
 
 const app = express();
 app.use(express.json());

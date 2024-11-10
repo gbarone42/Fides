@@ -1,11 +1,20 @@
+/* Libraries */
 const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { Pool } = require('pg');
 const path = require('path');
+const fs = require('fs');
+
+const config = require('@app_config/shared');
+const { authenticateToken, protectedRoute } = config.authMiddleware;  // Destructure the middleware
 
 const app = express();
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 
@@ -27,50 +36,20 @@ const pool = new Pool({
 });
 
 app.use(cors({
-    origin: ['http://localhost:4000', 'http://localhost:3000'],
+    origin: [config.services.LOGIN, config.services.EMPLOYEE_DASHBOARD],
     credentials: true
 }));
 
-function authenticateJWT(req, res, next) {
-  const token = req.cookies.token; // Read the token from the cookie
-
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: 'Token is not valid' });
-    }
-
-    req.user = user; // Store the user information for use in other routes
-    next();
-  });
-}
 
 // Serve the static HTML page for setting availability
-app.use('/web/login', express.static(path.join(__dirname, 'public')));
-
-app.get('/web/login', (req, res) => {
+app.use('/activities', express.static(path.join(__dirname, 'public')));
+app.get('/activities', authenticateToken, protectedRoute, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// debugging end point
-app.post('/log', (req, res) => {
-  const { message } = req.body;
-  
-  fs.appendFile('log.txt', message + '\n', (err) => {
-      if (err) {
-          console.error('Error writing to log file:', err);
-          return res.status(500).send('Failed to log message');
-      }
-      res.status(200).send('Message logged successfully');
-  });
 });
 
 
 // Endpoint to set availability
-app.post('/availability', async (req, res) => {
+app.post('/availability', authenticateToken, protectedRoute, async (req, res) => {
   const { employee_id, date, time, place } = req.body;
 
   if (!employee_id || !date || !time || !place) {
@@ -90,7 +69,7 @@ app.post('/availability', async (req, res) => {
 
 
 // Endpoint to get all availability for employees
-app.get('/availability', /* authenticateToken, */ async (req, res) => {
+app.get('/availability', authenticateToken, protectedRoute, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT a.id, a.date, a.time, a.place, u.username
