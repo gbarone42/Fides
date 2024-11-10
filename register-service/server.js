@@ -9,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 
 const config = require('@app_config/shared');
+const { authenticateToken, protectedRoute } = config.authMiddleware;  // Destructure the middleware
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads the .env file
 
@@ -97,7 +98,7 @@ app.post('/login', async (req, res) => {
     }
 
     // User authenticated, create a JWT token
-    const payload = { id: user.id, username: user.email };
+    const payload = { id: user.id, username: user.email, role: user.role };
     
     // Sign the JWT token with the secret key from the .env file
     const secretKey = process.env.SECRET_KEY;
@@ -106,10 +107,13 @@ app.post('/login', async (req, res) => {
     // Set the JWT as an HttpOnly cookie
     res.cookie('token', token, {
       httpOnly: true,                   // Prevents JavaScript access
-      secure: true,                     // Ensures secure cookie in production
-      sameSite: 'None',                 // Allows cross-origin requests with the cookie
+      secure: false,                    
+      sameSite: 'Lax',                 
+      path: '/',                        // Make sure cookie is available everywhere
       maxAge: 3600000                   // 1 hour expiration
     });
+
+    // console.log('Setting cookie with token:', token);
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 
