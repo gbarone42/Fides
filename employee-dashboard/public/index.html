@@ -26,16 +26,30 @@
 
     <script>
 
-        /* function parseJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
+        const UserState = {
+            id: null,
+            email: null,
+            role: null,
+            
+            // Method to set user data
+            setUser(userData) {
+                this.id = userData.id;
+                this.email = userData.email;
+                this.role = userData.role;
+            },
+            
+            // Method to clear user data
+            clearUser() {
+                this.id = null;
+                this.email = null;
+                this.role = null;
+            }
+        };
 
-            return JSON.parse(jsonPayload);
-        } */
-
+        function loadUserData(user) {
+            console.log('Loading ID: ', user.id);
+            // Use globalUserId here
+        }
 
         // Wait for page load before fetching data
         document.addEventListener('DOMContentLoaded', function() {
@@ -48,28 +62,22 @@
                 }
             })
             .then(response => {
-                console.log('Dashboard response status:', response.status);
-                console.log('Response headers:', response.headers);
-
                 if (!response.ok) {
                     throw new Error('Not authenticated');
                 }
                 return response.json();
             })
             .then(data => {
-                const userId = data.user.id;  // Get user ID from the response
-                console.log('User ID:', userId);
-                // Use userId here
+                UserState.setUser(data.user);
+                loadUserData(UserState);
             })
             .catch(error => console.error('Error fetching dashboard data:', error));
 
         });
 
-
         /* AVAILABILITY */
-        // console.log('User ID: ', userId);
 
-        /* async function fetchAvailability() {
+        async function fetchAvailability() {
             const response = await fetch('http://localhost:3000/availability');
             const availabilities = await response.json();
             const availabilityList = document.getElementById('availability-list');
@@ -89,43 +97,20 @@
             const time = document.getElementById('time').value;
             const place = document.getElementById('place').value;
 
+            const employee_id = UserState.id;
             await fetch('http://localhost:3000/availability', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ employee_id: employeeId, date, time, place })
+                body: JSON.stringify({ employee_id, date, time, place })
             });
 
             fetchAvailability(); // Refresh the availability list
         });
 
         // Fetch availability on page load
-        fetchAvailability(); */
-
-        /* Old version of checking the jwt */
-        /* if (!token) {
-            console.log('Token not found');
-            // Redirect to login page if not authenticated
-            window.location.href = 'http://localhost:5000/web/login/';
-        } else {
-            logToFile({token});
-            // Fetch data from the dashboard API
-            fetch('/activities', {
-                method: 'GET',
-            })
-            .then(response => {
-                if (!response.ok) {
-                window.location.href = 'http://localhost:5000/web/login/'; // Redirect if unauthorized
-                }
-                return response.json();
-            })
-            .then(data => {
-                logToFile('Dashboard data: '); // Handle data in dashboard
-                logToFile(data);
-            })
-            .catch(error => console.error('Error fetching dashboard data:', error));
-        } */
+        fetchAvailability();
 
     </script>
 </body>

@@ -99,7 +99,16 @@ app.get('/availability', authenticateToken, protectedRoute, async (req, res) => 
       SELECT a.id, a.date, a.time, a.place, u.username
       FROM availability a
       JOIN users u ON a.employee_id = u.id
-    `);
+      WHERE a.employee_id = $1
+      `, [req.user.id]);  // Use the ID from the authenticated user
+
+      if (result.rows.length === 0) {
+        return res.status(200).json({
+            message: 'No availability entries found',
+            data: []
+        });
+    }
+    
     res.status(200).json(result.rows);
   } catch (err) {
     res.status(500).json({ message: 'Failed to retrieve availability', error: err.message });
