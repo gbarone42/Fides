@@ -15,6 +15,8 @@ const pool = new Pool({
   port: 5432,
 });
 
+console.log('BUSINESS-DASHBOARD');
+
 // Serve the static HTML page for activities
 app.use('/web/activities', express.static(path.join(__dirname, 'public')));
 

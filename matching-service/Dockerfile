@@ -1,20 +1,23 @@
-# Use the official Node.js image.
+# Use Node.js official image
 FROM node:14
 
-# Set the working directory inside the container.
+# Create app directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
+# Copy package.json and install dependencies
 COPY package*.json ./
-
-# Install app dependencies
 RUN npm install
 
-# Copy the rest of the application.
+# Install Nodemon globally
+#RUN npm install -g nodemon
+
+# Copy the rest of the application code
 COPY . .
 
-# Expose port 6000
-EXPOSE 6000
+# Expose port 5000
+EXPOSE 5000
 
-# Run the app
+# Start the service
 CMD ["npm", "start"]
+#run nodemon to track local changes to files and restart the server automatically, HOT RELOADING
+#CMD ["nodemon", "server.js"]

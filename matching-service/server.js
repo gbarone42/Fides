@@ -7,6 +7,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+console.log('MATCHING-SERVICE');
+
+
 // Serve the static HTML file
 app.use('/web/matches', express.static(path.join(__dirname, 'public')));
 

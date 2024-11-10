@@ -23,23 +23,28 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Accedi</button>
-            <a href="registrazione.html" class="btn btn-transparent">Registrati</a>
+            <a href="/web/registrazione" class="btn btn-transparent">Registrati</a>
         </form>
     </div>
     
+    
+</body>
+
     <script>
         function login() {
-            const username = document.getElementById('Email').value;
+            const email = document.getElementById('Email').value;
             const password = document.getElementById('password').value;
+            
 
             fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ email, password })
             })
             .then(response => response.json())
             .then(data => {
-                if (data.redirectTo) {
+                if (data.token) {
+                    console.log('Received JWT:', data.token); 
                     window.location.href = data.redirectTo;
                 } else {
                     alert(data.message);
@@ -51,5 +56,4 @@
     </script>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
-</body>
 </html>

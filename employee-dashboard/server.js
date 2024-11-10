@@ -15,6 +15,8 @@ const pool = new Pool({
   port: 5432,
 });
 
+console.log('EMPLOYEE-DASHBOARD');
+
 // Serve the static HTML page for setting availability
 app.use('/web/login', express.static(path.join(__dirname, 'public')));
 
