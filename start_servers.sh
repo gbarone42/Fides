@@ -1,3 +1,4 @@
+
 # Array of directories
 directories=(
   "./register-service"
@@ -11,6 +12,7 @@ start_server() {
   cd "$1" || exit
   folder_name=$(basename "$1")
   echo "Starting server in $1"
+  #npm install ../shared   ---   Run this only the first time, to install the config dependencies
   nodemon server.js > "${folder_name}_log.txt" 2>&1 &
   cd - > /dev/null
 }

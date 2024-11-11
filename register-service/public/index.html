@@ -30,30 +30,51 @@
     
 </body>
 
-    <script>
-        function login() {
-            const email = document.getElementById('Email').value;
-            const password = document.getElementById('password').value;
-            
+<script>
 
-            fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.token) {
-                    console.log('Received JWT:', data.token); 
-                    window.location.href = data.redirectTo;
-                } else {
-                    alert(data.message);
-                }
-            });
+    function logToFile(message) {
+        fetch('/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+    }
 
-            return false;
-        }
-    </script>
+    function parseJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
 
-    <script src="/js/bootstrap.bundle.min.js"></script>
+        return JSON.parse(jsonPayload);
+    }
+
+    function login() {
+        const email = document.getElementById('Email').value;
+        const password = document.getElementById('password').value;
+        
+        fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Login successful') {
+                console.log('Login successful');
+                window.location.href = data.redirectTo;
+            }
+            else
+            {
+                console.log('login not working');
+                alert(data.message);
+            }
+        });
+
+        return false;
+    }
+</script>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
 </html>

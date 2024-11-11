@@ -6,6 +6,8 @@
 		"start": "node server.js"
 	},
 	"dependencies": {
+		"@app_config/shared": "file:../shared",
+		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.5",
 		"express": "^4.21.0",
 		"pg": "^8.13.0"
