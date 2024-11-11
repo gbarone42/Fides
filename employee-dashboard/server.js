@@ -11,8 +11,6 @@ const fs = require('fs');
 const config = require('@app_config/shared');
 const { authenticateToken, protectedRoute } = config.authMiddleware;  // Destructure the middleware
 
-console.log('Middleware loaded:', !!authenticateToken);
-
 const app = express();
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads the .env file
@@ -92,7 +90,7 @@ app.post('/availability', authenticateToken, protectedRoute, async (req, res) =>
 });
 
 
-// Endpoint to get all availability for employees
+// Endpoint to get availability for current logged in employee
 app.get('/availability', authenticateToken, protectedRoute, async (req, res) => {
   try {
     const result = await pool.query(`

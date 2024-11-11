@@ -1,31 +1,60 @@
-/* const express = require('express');
+/* Libraries */
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { Pool } = require('pg');
-const path = require('path'); */
+const path = require('path');
+const fs = require('fs');
 
-const config = require('@app_config/shared/config');
+const config = require('@app_config/shared');
+const { authenticateToken, protectedRoute } = config.authMiddleware;  // Destructure the middleware
 
 const app = express();
+
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads the .env file
+
+// Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 
-const pool = new Pool({
+/* const pool = new Pool({
   user: 'postgres',
   host: 'postgres',
   database: 'activities',
   password: 'user',
   port: 5432,
+}); */
+
+// DB local connection
+const pool = new Pool({
+  user: 'ulissecolla',
+  host: 'localhost',
+  database: 'activities',
+  password: '',
+  port: 5432,
 });
 
-console.log('BUSINESS-DASHBOARD');
+app.use(cors({
+    origin: [config.services.EMPLOYEE_DASHBOARD, config.services.BUSINESS_DASHBOARD, config.services.LOGIN],
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Serve the static HTML page for activities
-app.use('/web/activities', express.static(path.join(__dirname, 'public')));
+app.use('/business_dashboard', express.static(path.join(__dirname, 'public')));
+app.get('/business_dashboard', authenticateToken, protectedRoute, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Add a new activity (ensure user_id is passed from frontend)
 app.post('/activities', async (req, res) => {
   const { title, description, date, time, place, user_id } = req.body;
 
+  
   if (!title || !date || !time || !place || !user_id) {
     return res.status(400).json({ message: 'Title, date, time, place, and user_id are required' });
   }

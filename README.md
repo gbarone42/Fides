@@ -66,6 +66,12 @@ curl -X POST http://localhost:4000/activities -H "Content-Type: application/json
 
 ## SQL Commands
 
+### Show all users
+```sql
+-- Deletes all records from the activities table
+DELETE FROM activities;
+```
+
 ### Delete All Activities
 ```sql
 -- Deletes all records from the activities table

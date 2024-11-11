@@ -37,6 +37,9 @@
     <button onclick="searchActivities()">Search</button>
 
     <script>
+
+        
+
         async function fetchActivities() {
             const response = await fetch('http://localhost:4000/activities');
             const activities = await response.json();

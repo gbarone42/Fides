@@ -46,10 +46,11 @@
             }
         };
 
-        function loadUserData(user) {
+        // For debugging only
+        /* function loadUserData(user) {
             console.log('Loading ID: ', user.id);
             // Use globalUserId here
-        }
+        } */
 
         // Wait for page load before fetching data
         document.addEventListener('DOMContentLoaded', function() {
@@ -63,13 +64,14 @@
             })
             .then(response => {
                 if (!response.ok) {
+                    window.location.href = 'http://localhost:5000/web/login';
                     throw new Error('Not authenticated');
                 }
                 return response.json();
             })
             .then(data => {
                 UserState.setUser(data.user);
-                loadUserData(UserState);
+                // loadUserData(UserState);
             })
             .catch(error => console.error('Error fetching dashboard data:', error));
 

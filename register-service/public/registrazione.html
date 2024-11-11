@@ -72,9 +72,9 @@
             if (response.ok) {
                 // Redirect based on the account type
                 if (data.role === 'business') {
-                    window.location.href = 'http://localhost:4000/web/activities/';
+                    window.location.href = 'http://localhost:4000/business_dashboard';
                 } else if (data.role === 'employee') {
-                    window.location.href = 'http://localhost:3000/web/login/';
+                    window.location.href = 'http://localhost:3000/employee_dashboard';
                 }
             } else {
                 alert(data.message);
