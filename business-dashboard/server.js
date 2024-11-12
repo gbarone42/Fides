@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 
 const config = require('@app_config/shared');
-const { authenticateToken, protectedRoute } = config.authMiddleware;  // Destructure the middleware
+const { authenticateToken, protectedRouteBusiness } = config.authMiddleware;  // Destructure the middleware
 
 const app = express();
 
@@ -37,8 +37,9 @@ const pool = new Pool({
   port: 5432,
 });
 
+/* [config.services.EMPLOYEE_DASHBOARD, config.services.BUSINESS_DASHBOARD, config.services.LOGIN] */
 app.use(cors({
-    origin: [config.services.EMPLOYEE_DASHBOARD, config.services.BUSINESS_DASHBOARD, config.services.LOGIN],
+    origin: '*', //only for developmet, not safe in production
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -46,23 +47,24 @@ app.use(cors({
 
 // Serve the static HTML page for activities
 app.use('/business_dashboard', express.static(path.join(__dirname, 'public')));
-app.get('/business_dashboard', authenticateToken, protectedRoute, (req, res) => {
+app.get('/business_dashboard', authenticateToken, protectedRouteBusiness, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Add a new activity (ensure user_id is passed from frontend)
-app.post('/activities', async (req, res) => {
-  const { title, description, date, time, place, user_id } = req.body;
 
-  
-  if (!title || !date || !time || !place || !user_id) {
-    return res.status(400).json({ message: 'Title, date, time, place, and user_id are required' });
+// Add a new activity (ensure user_id is passed from frontend)
+app.post('/activities', authenticateToken, protectedRouteBusiness, async (req, res) => {
+  const { title, description, date, time, place } = req.body;
+
+
+  if (!title || !date || !time || !place ) {
+    return res.status(400).json({ message: 'Title, date, time and place are required' });
   }
 
   try {
     await pool.query(
       'INSERT INTO activities (title, description, date, time, place, user_id) VALUES ($1, $2, $3, $4, $5, $6)', 
-      [title, description, date, time, place, user_id]
+      [title, description, date, time, place, req.user.id]
     );
     res.status(201).json({ message: 'Activity created successfully' });
   } catch (err) {

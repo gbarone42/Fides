@@ -45,7 +45,7 @@ const authenticateToken = (req, res, next) => {
 
 
 // Protected routes middleware
-const protectedRoute = (req, res, next) => {
+const protectedRouteEmployee = (req, res, next) => {
   try {
     // Check if user has necessary role/permissions
     // console.log('Employee route check. User role:', req.user.role);
@@ -62,4 +62,21 @@ const protectedRoute = (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken, protectedRoute };  // Export the functions
+const protectedRouteBusiness = (req, res, next) => {
+  try {
+    // Check if user has necessary role/permissions
+    // console.log('Business route check. User role:', req.user.role);
+    
+    if (req.user.role !== 'business') {
+      return res.status(403).json({ 
+        message: 'Access denied', 
+        redirectTo: '/login' 
+      });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { authenticateToken, protectedRouteEmployee, protectedRouteBusiness };  // Export the functions

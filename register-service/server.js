@@ -15,8 +15,12 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') }); // Loads
 
 const app = express();
 app.use(express.json());
+/* [config.services.EMPLOYEE_DASHBOARD, config.services.BUSINESS_DASHBOARD, config.services.LOGIN] */
 app.use(cors({
-  origin: '*' /* ['http://localhost:3000', 'http://localhost:4000'] */
+  origin: '*', //only for developmet, not safe in production
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // DB Docker connection

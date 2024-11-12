@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 
 const config = require('@app_config/shared');
-const { authenticateToken, protectedRoute } = config.authMiddleware;  // Destructure the middleware
+const { authenticateToken, protectedRouteEmployee } = config.authMiddleware;  // Destructure the middleware
 
 const app = express();
 
@@ -37,8 +37,9 @@ const pool = new Pool({
   port: 5432,
 });
 
+/* [config.services.EMPLOYEE_DASHBOARD, config.services.BUSINESS_DASHBOARD, config.services.LOGIN] */
 app.use(cors({
-    origin: [config.services.EMPLOYEE_DASHBOARD, config.services.BUSINESS_DASHBOARD, config.services.LOGIN],
+    origin: '*', //only for developmet, not safe in production
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -47,13 +48,13 @@ app.use(cors({
 
 // Serve the static HTML page for setting availability
 app.use('/employee_dashboard', express.static(path.join(__dirname, 'public')));
-app.get('/employee_dashboard', authenticateToken, protectedRoute, (req, res) => {
+app.get('/employee_dashboard', authenticateToken, protectedRouteEmployee, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 
 // serve the user ID
-app.get('/api/employee_dashboard', authenticateToken, protectedRoute, async (req, res) => {
+app.get('/api/employee_dashboard', authenticateToken, protectedRouteEmployee, async (req, res) => {
   try {
       // Send JSON data instead of HTML
       res.json({
@@ -71,7 +72,7 @@ app.get('/api/employee_dashboard', authenticateToken, protectedRoute, async (req
 
 
 // Endpoint to set availability
-app.post('/availability', authenticateToken, protectedRoute, async (req, res) => {
+app.post('/availability', authenticateToken, protectedRouteEmployee, async (req, res) => {
   const { employee_id, date, time, place } = req.body;
 
   if (!employee_id || !date || !time || !place) {
@@ -90,8 +91,8 @@ app.post('/availability', authenticateToken, protectedRoute, async (req, res) =>
 });
 
 
-// Endpoint to get availability for current logged in employee
-app.get('/availability', authenticateToken, protectedRoute, async (req, res) => {
+// Endpoint to get availability for current logged in employees
+app.get('/availability', authenticateToken, protectedRouteEmployee, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT a.id, a.date, a.time, a.place, u.username

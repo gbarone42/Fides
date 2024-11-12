@@ -27,7 +27,8 @@
         <label for="place">Place:</label>
         <input type="text" id="place" name="place" required><br>
 
-        <input type="hidden" id="user_id" value="1"> <!-- Assume logged-in user has ID 1 -->
+        <!-- Replaced this with actual-logged-in user's ID -->
+       <!--  <input type="hidden" id="user_id" value="1"> --> <!-- Assume logged-in user has ID 1 -->
 
         <button type="submit">Add Activity</button>
     </form>
@@ -37,8 +38,6 @@
     <button onclick="searchActivities()">Search</button>
 
     <script>
-
-        
 
         async function fetchActivities() {
             const response = await fetch('http://localhost:4000/activities');
@@ -69,14 +68,14 @@
             const date = document.getElementById('date').value;
             const time = document.getElementById('time').value;
             const place = document.getElementById('place').value;
-            const user_id = document.getElementById('user_id').value;
+            /* I can retrieve the user's ID on the server side */
 
             await fetch('http://localhost:4000/activities', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title, description, date, time, place, user_id })
+                body: JSON.stringify({ title, description, date, time, place })
             });
 
             fetchActivities();
