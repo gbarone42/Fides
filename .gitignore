@@ -1,3 +1,4 @@
 data/
 *_log.txt
 .env
+docker-compose-hot-reloading-test.yml
