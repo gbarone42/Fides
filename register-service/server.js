@@ -117,7 +117,7 @@ app.post('/login', async (req, res) => {
       maxAge: 3600000                   // 1 hour expiration
     });
 
-    // console.log('Setting cookie with token:', token);
+    console.log('Setting cookie with token:', token);
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 

@@ -209,10 +209,10 @@ bash start_servers.sh
 
 ### LINKS
 ```bash
-http://localhost:3000/web/login/ //EmployeeDashboard
+http://localhost:3000/employee_dashboard //EmployeeDashboard
 ```
 ```bash
-http://localhost:4000/web/activities/ //BusinessDashboard
+http://localhost:4000/business_dashboard //BusinessDashboard
 ```
 ```bash
 http://localhost:5000/web/registrazione //Registrazione
