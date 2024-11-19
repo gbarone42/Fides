@@ -118,6 +118,56 @@ app.get('/activities/search', async (req, res) => {
   }
 });
 
+
+//Search matching activities
+app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBusiness, async (req, res) => {
+  try {
+
+    const activityId = req.params.activityId;
+    const userId = req.user.id;
+
+    // First get the activity details
+    const activityQuery = `SELECT date, time FROM activities WHERE id = $1`;
+    const activityResult = await pool.query(activityQuery, [activityId]);
+    
+    const date = activityResult.rows[0].date;
+    const time = activityResult.rows[0].time;
+
+    const query = `SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username, u.role
+                  FROM activities a
+                  JOIN users u ON a.user_id = u.id`;
+
+    /*  
+       
+      
+      WHERE a.date = $1 
+      AND a.time = $2
+      AND u.role = 'employee'
+      AND a.id != $3
+      AND NOT EXISTS (
+          SELECT 1 FROM activities 
+          WHERE user_id = $4 
+          AND id = a.id
+    ) */
+
+    const result = await pool.query(query/* , [date, time, activityId] */);
+
+
+    // debugging prints
+    i = 0;
+    while (result.rows[i])
+    {
+      console.log('--- id: ', result.rows[0].id);
+      i++;
+    }
+
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to retrieve matches or no matches found', error: err.message });
+  }
+});
+
 app.listen(4000, () => {
   console.log('Activity service running on port 4000');
 });

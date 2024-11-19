@@ -37,6 +37,10 @@
     <input type="text" id="search-query" autocomplete="off" placeholder="Search by title">
     <button onclick="searchActivities()">Search</button>
 
+    <h2>Matching Activities</h2>
+    <div id="matching-activity-list"></div>
+
+
     <script>
 
         async function fetchActivities() {
@@ -49,6 +53,7 @@
                 const item = document.createElement('div');
                 item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
                 item.innerHTML += `<button onclick="deleteActivity(${activity.id})">Delete</button>`;
+                item.innerHTML += `<button onclick="searchMatchingActivities(${activity.id})">Search matches</button>`; //button to search for matches --> searchMatchingActivities(id)
                 activityList.appendChild(item);
             });
         }
@@ -93,6 +98,23 @@
                 const item = document.createElement('div');
                 item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
                 item.innerHTML += `<button onclick="deleteActivity(${activity.id})">Delete</button>`;
+                activityList.appendChild(item);
+            });
+        }
+
+        // Show all matching availabilities for a certain activity
+        async function searchMatchingActivities(activityId) {
+
+            const response = await fetch(`http://localhost:4000/matching-activities/${activityId}`);
+            const activities = await response.json();
+            const activityList = document.getElementById('matching-activity-list');
+            activityList.innerHTML = '';
+
+            // Matches from employees' availabilities
+            activities.forEach(activity => {
+                const item = document.createElement('div');
+                item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
+                /* item.innerHTML += `<button onclick="deleteActivity(${activity.id})">Delete</button>`; */
                 activityList.appendChild(item);
             });
         }
