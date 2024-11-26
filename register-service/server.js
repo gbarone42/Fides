@@ -59,7 +59,7 @@ app.get('/web/login', (req, res) => {
 
 
 // Registration endpoint
-app.post('/register', async (req, res) => {
+app.post('/registrazione', async (req, res) => {
   const { nome, cognome, dataDiNascita, email, username, password, accountType } = req.body;
 
   try {
@@ -114,16 +114,16 @@ app.post('/login', async (req, res) => {
       secure: false,                    
       sameSite: 'Lax',                 
       path: '/',                        // Make sure cookie is available everywhere
-      maxAge: 3600000                   // 1 hour expiration
+      maxAge: 7200000                   // 1 hour expiration
     });
 
-    console.log('Setting cookie with token:', token);
+    console.log('Setting cookie with token: ', token);
 
     // Redirect based on role
     const redirectTo = user.role === 'business' ? 
       config.services.BUSINESS_DASHBOARD : 
       config.services.EMPLOYEE_DASHBOARD ;
-    res.json({ message: 'Login successful', redirectTo });
+    res.json({ message: 'Login successful', redirectTo, token: token });
   } catch (err) {
     console.error('Login failed:', err);  // Log the actual error for debugging
     res.status(500).json({ message: 'Login failed', error: err.message });

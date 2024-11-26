@@ -79,10 +79,12 @@ app.post('/availability', authenticateToken, protectedRouteEmployee, async (req,
     return res.status(400).json({ message: 'Employee ID, date, time, and place are required' });
   }
 
+  const formattedDate = date.split('T')[0];
+
   try {
     await pool.query(
       'INSERT INTO availability (employee_id, date, time, place) VALUES ($1, $2, $3, $4)', 
-      [employee_id, date, time, place]
+      [employee_id, formattedDate, time, place]
     );
     res.status(201).json({ message: 'Availability set successfully' });
   } catch (err) {

@@ -44,8 +44,32 @@
         .then(response => response.json())
         .then(data => {
             if (data.message === 'Login successful') {
-                console.log('Login successful');
-                window.location.href = data.redirectTo;
+
+                // Determine which service to use based on redirectTo
+                const serviceUrl = data.redirectTo.includes('business') ? 
+                    'http://localhost:4000' : 
+                    'http://localhost:3000';
+                    
+                // Make authenticated request to appropriate service
+                fetch(`${serviceUrl}${data.redirectTo}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${data.token}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    // Redirect to appropriate dashboard
+                    window.location.href = `${serviceUrl}${data.redirectTo}`;
+                })
+                .catch(error => {
+                    console.error('Dashboard redirect error:', error);
+                });
+
+                /* console.log('Login successful');
+                localStorage.setItem('token', data.token);  // Store token from response
+                console.log('Saved token is: ', data.token);
+                window.location.href = data.redirectTo; */
             }
             else
             {
@@ -53,6 +77,8 @@
                 alert(data.message);
             }
         });
+
+        
 
         return false;
     }

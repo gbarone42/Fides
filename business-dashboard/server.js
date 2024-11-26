@@ -47,9 +47,29 @@ app.use(cors({
 
 // Serve the static HTML page for activities
 app.use('/business_dashboard', express.static(path.join(__dirname, 'public')));
-app.get('/business_dashboard', authenticateToken, protectedRouteBusiness, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Business dashboard endpoint
+app.get('/business_dashboard', (req, res) => {
+  // Get token from Authorization header
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  
+  if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+      // Verify the token
+      const decoded = jwt.verify(token, process.env.SECRET_KEY);
+      // Token is valid, proceed with dashboard
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  } catch(err) {
+      res.status(401).json({ message: 'Invalid token' });
+  }
 });
+// Old Business dashboard endpoint
+/* app.get('/business_dashboard', authenticateToken, protectedRouteBusiness, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+}); */
 
 
 // Add a new activity (ensure user_id is passed from frontend)
@@ -61,10 +81,12 @@ app.post('/activities', authenticateToken, protectedRouteBusiness, async (req, r
     return res.status(400).json({ message: 'Title, date, time and place are required' });
   }
 
+  const formattedDate = date.split('T')[0];
+
   try {
     await pool.query(
       'INSERT INTO activities (title, description, date, time, place, user_id) VALUES ($1, $2, $3, $4, $5, $6)', 
-      [title, description, date, time, place, req.user.id]
+      [title, description, formattedDate, time, place, req.user.id]
     );
     res.status(201).json({ message: 'Activity created successfully' });
   } catch (err) {
@@ -76,7 +98,9 @@ app.post('/activities', authenticateToken, protectedRouteBusiness, async (req, r
 app.get('/activities', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username, u.role
+      SELECT a.id, a.title, a.description,
+      TO_CHAR(a.date, 'YYYY-MM-DD') as date
+      , a.time, a.place, u.username, u.role
       FROM activities a
       JOIN users u ON a.user_id = u.id
     `);
@@ -133,34 +157,19 @@ app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBus
     const date = activityResult.rows[0].date;
     const time = activityResult.rows[0].time;
 
-    const query = `SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username, u.role
-                  FROM activities a
-                  JOIN users u ON a.user_id = u.id`;
+    console.log('Date and time being queried:', { date, time });
 
-    /*  
-       
-      
-      WHERE a.date = $1 
-      AND a.time = $2
-      AND u.role = 'employee'
-      AND a.id != $3
-      AND NOT EXISTS (
-          SELECT 1 FROM activities 
-          WHERE user_id = $4 
-          AND id = a.id
-    ) */
+    const query = `SELECT a.id, a.date, a.time, a.place, u.username, u.role
+                  FROM availability a
+                  JOIN users u ON a.employee_id = u.id
+                  WHERE a.time = $1
+                  AND u.role = 'employee'`;
+                  
+                  // AND a.time = $2
+    // const query = 'SELECT * FROM users WHERE role = $1';
 
-    const result = await pool.query(query/* , [date, time, activityId] */);
-
-
-    // debugging prints
-    i = 0;
-    while (result.rows[i])
-    {
-      console.log('--- id: ', result.rows[0].id);
-      i++;
-    }
-
+    const result = await pool.query(query, [time]);
+    console.log('Query results:', result.rows);
 
     res.status(200).json(result.rows);
   } catch (err) {
@@ -171,3 +180,22 @@ app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBus
 app.listen(4000, () => {
   console.log('Activity service running on port 4000');
 });
+
+/* Query WIP */
+/*
+      WHERE a.date = $1 
+      AND a.time = $2
+      AND u.role = 'employee'
+      AND a.id != $3
+      AND NOT EXISTS (
+          SELECT 1 FROM activities 
+          WHERE user_id = $4 
+          AND id = a.id
+    ) */
+
+    /* SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username, u.role
+    FROM activities a
+    JOIN users u ON a.user_id = u.id
+    WHERE a.date = $1 
+    AND a.time = $2
+    AND u.role = 'employee' */
