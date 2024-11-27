@@ -2,6 +2,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { Pool } = require('pg');

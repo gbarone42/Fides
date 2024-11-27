@@ -27,9 +27,6 @@
         <label for="place">Place:</label>
         <input type="text" id="place" name="place" required><br>
 
-        <!-- Replaced this with actual-logged-in user's ID -->
-       <!--  <input type="hidden" id="user_id" value="1"> --> <!-- Assume logged-in user has ID 1 -->
-
         <button type="submit">Add Activity</button>
     </form>
 
@@ -40,134 +37,11 @@
     <h2>Matching Activities</h2>
     <div id="matching-activity-list"></div>
 
+    <script src="./js/fetchActivities.js"></script>
+    <script src="./js/deleteActivity.js"></script>
+    <script src="./js/activityForm.js"></script>
+    <script src="./js/searchActivities.js"></script>
+    <script src="./js/searchMatchingActivities.js"></script>
 
-    <script>
-
-        async function fetchActivities() {
-            const response = await fetch('http://localhost:4000/activities');
-            const activities = await response.json();
-            const activityList = document.getElementById('activity-list');
-            activityList.innerHTML = '';
-
-            activities.forEach(activity => {
-                const item = document.createElement('div');
-                item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
-                item.innerHTML += `<button onclick="deleteActivity(${activity.id})">Delete</button>`;
-                item.innerHTML += `<button onclick="searchMatchingActivities(${activity.id})">Search matches</button>`; //button to search for matches --> searchMatchingActivities(id)
-                activityList.appendChild(item);
-            });
-        }
-
-        async function deleteActivity(activityId) {
-            await fetch(`http://localhost:4000/activities/${activityId}`, {
-                method: 'DELETE'
-            });
-            fetchActivities();
-        }
-
-        document.getElementById('activity-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-            const place = document.getElementById('place').value;
-            /* I can retrieve the user's ID on the server side */
-
-            await fetch('http://localhost:4000/activities', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title, description, date, time, place })
-            });
-
-            fetchActivities();
-        });
-
-        async function searchActivities() {
-            const query = document.getElementById('search-query').value;
-
-            const response = await fetch(`http://localhost:4000/activities/search?title=${query}`);
-            const activities = await response.json();
-            const activityList = document.getElementById('activity-list');
-            activityList.innerHTML = '';
-
-            activities.forEach(activity => {
-                const item = document.createElement('div');
-                item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
-                item.innerHTML += `<button onclick="deleteActivity(${activity.id})">Delete</button>`;
-                activityList.appendChild(item);
-            });
-        }
-
-
-        // Get JWT from cookie
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            console.log('document.cookie is: ', value);
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-
-        // Show all matching availabilities for a certain activity
-
-        async function searchMatchingActivities(activityId) {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:4000/matching-activities/${activityId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const activities = await response.json();
-                const activityList = document.getElementById('matching-activity-list');
-                activityList.innerHTML = '';
-
-                activities.forEach(activity => {
-                    const formattedDate = new Date(activity.date).toISOString().split('T')[0];
-                    const item = document.createElement('div');
-                    item.textContent = `MATCHING AVAILABILITY --> ${formattedDate} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
-                    activityList.appendChild(item);
-                });
-            } catch (error) {
-                console.error('Error fetching matching activities:', error);
-                document.getElementById('matching-activity-list').innerHTML = 'Failed to load matching activities';
-            }
-        }
-
-        /* async function searchMatchingActivities(activityId) {
-            const token = localStorage.getItem('token');
-            console.log('TOKEN is: ', token);
-
-            const response = await fetch(`http://localhost:4000/matching-activities/${activityId}`,
-                    { headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }}
-            );
-            const activities = await response.json();
-            const activityList = document.getElementById('matching-activity-list');
-            activityList.innerHTML = '';
-
-            // Matches from employees' availabilities
-            activities.forEach(activity => {
-                const item = document.createElement('div');
-                item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
-                // item.innerHTML += `<button onclick="deleteActivity(${activity.id})">Delete</button>`;
-                activityList.appendChild(item);
-            });
-        } */
-
-        // Fetch activities on page load
-        fetchActivities();
-    </script>
 </body>
 </html>
