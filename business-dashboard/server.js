@@ -279,8 +279,10 @@ app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBus
 });
 
 /* ROLES RELATED */
-app.post('/activities/:activityId/roles', authenticateToken, protectedRouteBusiness, async (req, res) => {
+app.post('/activities/roles/:activityId', authenticateToken, protectedRouteBusiness, async (req, res) => {
   const { role, description, time } = req.body;
+
+  console.log('Role:', role);
 
   if (!role || !time ) {
     return res.status(400).json({ message: 'Role and time are required' });
@@ -296,6 +298,17 @@ app.post('/activities/:activityId/roles', authenticateToken, protectedRouteBusin
     res.status(201).json({ message: 'Role created successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to create role', error: err.message });
+  }
+});
+
+app.get('/activities/:activityId/roles', async (req, res) => {
+  const activityId = req.params.activityId;
+
+  try {
+    const result = await pool.query('SELECT role, description, time FROM roles WHERE activity_id = $1', [activityId]);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to retrieve roles', error: err.message });
   }
 });
 
