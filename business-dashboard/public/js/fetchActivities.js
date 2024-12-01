@@ -12,16 +12,16 @@ async function fetchActivities() {
         item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
 
         //button to delete activity --> deleteActivity(id)
-        item.innerHTML += `<button onclick="deleteActivity(${activity.id})" style="display: block;">Delete</button>`;
+        item.innerHTML += `<button style="margin: 3px;" onclick="deleteActivity(${activity.id})" style="display: block;">Delete</button>`;
 
         //button to search for matches --> searchMatchingActivities(id)
-        item.innerHTML += `<button onclick="searchMatchingActivities(${activity.id})" style="display: block;">Search matches</button>`;
+        item.innerHTML += `<button style="margin: 3px;" onclick="searchMatchingActivities(${activity.id})" style="display: block;">Search matches</button>`;
 
         //button to show roles --> showRoles()
-        item.innerHTML += `<div data-show-roles-for="${activity.id}"><button onclick="fetchRoles(${activity.id})" style="display: block;">Show roles</button></div>`;
+        item.innerHTML += `<div data-show-roles-for="${activity.id}"><button style="margin: 3px;" onclick="fetchRoles(${activity.id})" style="display: block;">Show roles</button></div>`;
 
         //button to add role --> addRole()
-        item.innerHTML += `<button data-role-id="roleBtn" onclick="addRole(${activity.id})" style="display: block;">Add role</button>`;
+        item.innerHTML += `<div data-role-form="${activity.id}"><button style="margin: 3px;" data-role-id="roleBtn" onclick="addRole(${activity.id})" style="display: block;">Add role</button></div>`;
 
         item.setAttribute('data-activity-id', activity.id);
 

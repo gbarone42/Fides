@@ -1,5 +1,15 @@
+let toggleRoles = false;  // To toggle the roles display
 
 async function fetchRoles(activityId) {
+
+    if (toggleRoles) {
+        const rolesDiv = document.querySelector(`div[data-show-roles-for="${activityId}"]`);
+        rolesDiv.innerHTML = `<button style="margin: 3px; display: block;" onclick="fetchRoles(${activityId})">Show roles</button>`;
+        toggleRoles = false;
+        return;
+    }
+
+    toggleRoles = true;
 
     // const activityId = document.querySelector(`div[data-show-roles-for="${activityId}"]`);
     const response = await fetch(`http://localhost:4000/activities/${activityId}/roles`);

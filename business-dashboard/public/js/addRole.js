@@ -1,10 +1,19 @@
 
+let toggleForm = false;  // To toggle the form display
+
 function addRole(activityId) {
 
-    const roleDiv = document.querySelector(`div[data-activity-id="${activityId}"]`);
-    const roleBtn = roleDiv.querySelector('button[data-role-id="roleBtn"]');
+    if (toggleForm) {
+        const roleDiv = document.querySelector(`div[data-role-form="${activityId}"]`);
+        roleDiv.innerHTML = `<button style="margin: 3px; display: block;" data-role-id="roleBtn" onclick="addRole(${activityId})">Add role</button>`;
+        roleDiv.style.padding = '0'; // Reset padding
+        toggleForm = false;
+        return;
+    }
 
-    roleBtn.style.display = 'none'; //It disappears, otherwise it would be duplicated and be clickable multiple times. It reappears after the form is submitted.
+    toggleForm = true;
+
+    const roleDiv = document.querySelector(`div[data-role-form="${activityId}"]`);
 
     // Create unique ids for each form
     const roleId = 'role' + activityId;

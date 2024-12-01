@@ -259,8 +259,6 @@ app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBus
     const time = activityResult.rows[0].time;
     const place = activityResult.rows[0].place;
 
-    // console.log('Date and time being queried:', { date, time, place });
-
     // Search in Availability table the entries that matches the current activity for date, time amd place
     const query = `SELECT a.id, a.date, a.time, a.place, u.username, u.role
                   FROM availability a
@@ -270,7 +268,6 @@ app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBus
                   AND a.place = $3`;
 
     const result = await pool.query(query, [date, time, place]);
-    // console.log('Query results:', result.rows);
 
     res.status(200).json(result.rows);
   } catch (err) {
@@ -301,6 +298,7 @@ app.post('/activities/roles/:activityId', authenticateToken, protectedRouteBusin
   }
 });
 
+// Get all roles for a specific activity
 app.get('/activities/:activityId/roles', async (req, res) => {
   const activityId = req.params.activityId;
 

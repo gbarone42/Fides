@@ -35,6 +35,14 @@
 } */
 
 async function roleForm(activityId) {
+
+    if (toggleForm) {
+        const formDiv = document.querySelector(`div[data-show-form-for="${activityId}"]`);
+        formDiv.innerHTML = '<button onclick="roleForm(${activityId})" style="display: block;">Add role</button>';
+        toggleForm = false;
+        return;
+    }
+
     try {
         const role = document.getElementById('role' + activityId).value;
         const description = document.getElementById('roleDescription' + activityId).value;

@@ -2,12 +2,12 @@
  // Show all matching availabilities for a certain activity
 async function searchMatchingActivities(activityId) {
     try {
-        // const token = localStorage.getItem('token');
+        // const token = localStorage.getItem('token'); //DO I need this?
         // console.log('TOKEN is: ', token);
 
         const response = await fetch(`http://localhost:4000/matching-activities/${activityId}`, {
             headers: {
-                // 'Authorization': `Bearer ${token}`,
+                // 'Authorization': `Bearer ${token}`, //DO I need this?
                 'Content-Type': 'application/json'
             }
         });
