@@ -115,7 +115,7 @@ app.post('/login', async (req, res) => {
       secure: false,                    
       sameSite: 'Lax',                 
       path: '/',                        // Make sure cookie is available everywhere
-      maxAge: 7200000                   // 1 hour expiration
+      maxAge: 24 * 3600000                   // 1 day expiration
     });
 
     console.log('Setting cookie with token: ', token);

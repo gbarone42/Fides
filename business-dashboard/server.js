@@ -279,8 +279,6 @@ app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBus
 app.post('/activities/roles/:activityId', authenticateToken, protectedRouteBusiness, async (req, res) => {
   const { role, description, time } = req.body;
 
-  console.log('Role:', role);
-
   if (!role || !time ) {
     return res.status(400).json({ message: 'Role and time are required' });
   }
@@ -303,13 +301,30 @@ app.get('/activities/:activityId/roles', async (req, res) => {
   const activityId = req.params.activityId;
 
   try {
-    const result = await pool.query('SELECT role, description, time FROM roles WHERE activity_id = $1', [activityId]);
+    const result = await pool.query('SELECT id, activity_id, role, description, time, status FROM roles WHERE activity_id = $1', [activityId]);
     res.status(200).json(result.rows);
   } catch (err) {
     res.status(500).json({ message: 'Failed to retrieve roles', error: err.message });
   }
 });
 
+// Delete a role by ID
+app.delete('/roles/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('DELETE FROM roles WHERE id = $1', [id]);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Role not found' });
+    }
+
+    res.status(200).json({ message: 'Role deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete role', error: err.message });
+  }
+});
+
 app.listen(4000, () => {
-  console.log('Activity service running on port 4000');
+  console.log('Role service running on port 4000');
 });

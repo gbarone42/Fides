@@ -1,17 +1,17 @@
 
-let toggleForm = false;  // To toggle the form display
+let toggleFormBtn = false;  // To toggle the form display
 
 function addRole(activityId) {
 
-    if (toggleForm) {
+    if (toggleFormBtn) {
         const roleDiv = document.querySelector(`div[data-role-form="${activityId}"]`);
-        roleDiv.innerHTML = `<button style="margin: 3px; display: block;" data-role-id="roleBtn" onclick="addRole(${activityId})">Add role</button>`;
+        roleDiv.innerHTML = `<button style="margin: 3px; display: block;" data-role-id="roleBtn" onclick="addRole(${activityId})">➕</button>`;
         roleDiv.style.padding = '0'; // Reset padding
-        toggleForm = false;
+        toggleFormBtn = false;
         return;
     }
 
-    toggleForm = true;
+    toggleFormBtn = true;
 
     const roleDiv = document.querySelector(`div[data-role-form="${activityId}"]`);
 
