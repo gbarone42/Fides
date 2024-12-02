@@ -226,7 +226,7 @@ app.patch('/refuse-role/:roleId', authenticateToken, protectedRouteEmployee, asy
   const roleId = req.params.roleId;
 
   try {
-    const result = await pool.query('UPDATE roles SET status = $1 WHERE id = $2', ['refused', roleId]);
+    const result = await pool.query('UPDATE roles SET status = $1 WHERE id = $2', ['vacant', roleId]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: 'Role not found' });

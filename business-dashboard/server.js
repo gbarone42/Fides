@@ -100,9 +100,7 @@ app.post('/activities', authenticateToken, protectedRouteBusiness, async (req, r
 app.get('/activities', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT a.id, a.title, a.description,
-      TO_CHAR(a.date, 'YYYY-MM-DD') as date
-      , a.time, a.place, u.username, u.role
+      SELECT a.id, a.title, a.description, a.date, a.time, a.place, u.username, u.role
       FROM activities a
       JOIN users u ON a.user_id = u.id
     `);
