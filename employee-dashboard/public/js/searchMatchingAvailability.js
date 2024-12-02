@@ -25,7 +25,7 @@ async function searchMatchingAvailability(availabilityId) {
             const item = document.createElement('div');
             item.setAttribute('data-activity-match-id', activity.id);
 
-            item.textContent = `MATCHING ACTIVITY --> ${formattedDate} ${activity.time} at ${activity.place} - Created by: ${activity.user_id}`;
+            item.innerHTML = `<p><strong>MATCH FOUND</strong></p> <p><strong>Activity:</strong> ${activity.activity}</p> <p><strong>Date:</strong> ${formattedDate}</p> <p><strong>Time:</strong> ${activity.time}</p> <p><strong>Place:</strong> ${activity.place}</p>`;
 
             activitiesList.appendChild(item);
 

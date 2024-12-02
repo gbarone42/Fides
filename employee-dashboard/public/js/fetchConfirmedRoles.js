@@ -22,7 +22,11 @@ async function fetchConfirmedRoles() {
         const item = document.createElement('div');
         const formattedDate = new Date(role.date).toISOString().split('T')[0];
 
-        item.textContent = `CONFIRMED --> ${role.role} - DATE: ${formattedDate} TIME: ${role.time} at ${role.place}`;
+        item.classList.add('confirmed-role-item');
+
+        item.innerHTML = `<p><strong>CONFIRMED</strong></p> <p><strong>ROLE:</strong> ${role.role}</p> <p><strong>DATE:</strong> ${formattedDate}</p> <p><strong>TIME:</strong> ${role.time}</p> <p><strong>PLACE:</strong> ${role.place}</p>`;
+
+        // item.textContent = `CONFIRMED --> ${role.role} - DATE: ${formattedDate} TIME: ${role.time} at ${role.place}`;
 
         //button to delete activity --> deleteAvailability(id)
         // item.innerHTML += `<button style="margin: 3px;" onclick="deleteAvailability(${availability.id})" style="display: block;">Delete</button>`;

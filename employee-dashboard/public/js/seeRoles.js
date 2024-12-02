@@ -38,12 +38,14 @@ async function seeRoles(activityId, availabilityId) {
             item.style.paddingLeft = '10px';
             item.style.paddingTop = '5px';
 
-            item.textContent = `ROLE FOUND --> ROLE: ${role.role} - DESCRITPION: ${role.description} - STATUS: ${role.status}`;
+            item.innerHTML = `<p><strong>ROLE FOUND</strong></p> <p><strong>ROLE:</strong> ${role.role}</p> <p><strong>DESCRITPION:</strong> ${role.description}</p> <p><strong>STATUS:</strong> ${role.status}</p>`;
+
+            // item.textContent = `ROLE FOUND --> ROLE: ${role.role} - DESCRITPION: ${role.description} - STATUS: ${role.status}`;
 
             // Confirm
-            item.innerHTML += `<button onclick="confirmRole(${role.id}, ${availabilityId})">Confirm role</button>`;
+            item.innerHTML += `<button data-btn="confirm" onclick="confirmRole(${role.id}, ${availabilityId})">Confirm role</button>`;
             // Refuse
-            item.innerHTML += `<button onclick="refuseRole(${role.id}, ${availabilityId})">Refuse role</button>`;
+            item.innerHTML += `<button data-btn="refuse" onclick="refuseRole(${role.id}, ${availabilityId})">Refuse role</button>`;
 
             rolesList.appendChild(item);
         });

@@ -17,13 +17,16 @@ async function fetchAvailability() {
 
     availabilities.forEach(availability => {
         const item = document.createElement('div');
+        item.classList.add('availability-item');
 
-        item.textContent = `${availability.username} - ${availability.date} ${availability.time} at ${availability.place}`;
+        const formattedDate = new Date(availability.date).toLocaleDateString();
 
-        item.innerHTML += `<button style="margin: 3px;" onclick="searchMatchingAvailability(${availability.id})" style="display: block;">Search matches</button>`;
+        item.innerHTML = `<p><strong>Username:</strong> ${availability.username}</p> <p><strong>Date:</strong> ${formattedDate}</p> <p><strong>Time:</strong> ${availability.time}</p> <p><strong>Place:</strong> ${availability.place}</p>`;
+
+        item.innerHTML += `<button onclick="searchMatchingAvailability(${availability.id})">Search matches</button>`;
 
         //button to delete activity --> deleteAvailability(id)
-        item.innerHTML += `<button style="margin: 3px;" onclick="deleteAvailability(${availability.id})" style="display: block;">Delete</button>`;
+        item.innerHTML += `<button onclick="deleteAvailability(${availability.id})">Delete</button>`;
 
         availabilityList.appendChild(item);
     });

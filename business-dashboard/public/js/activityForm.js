@@ -25,11 +25,11 @@ document.getElementById('activity-form').addEventListener('submit', async (event
         }
         
         const result = await response.json();
-        console.log('Success:', result);
-        
+        window.location.reload();
+
     } catch (error) {
         console.error('Error:', error);
     }
 
-    fetchActivities();
+    // fetchActivities();
 });
