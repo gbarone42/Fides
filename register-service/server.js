@@ -26,8 +26,8 @@ app.use(cors({
 
 // DB Docker connection
 /* const pool = new Pool({
-  user: 'ulissecolla',
-  host: 'localhost',
+  user: 'postgres',
+  host: 'postgres',
   database: 'activities',
   password: 'user',
   port: 5432,
@@ -35,10 +35,10 @@ app.use(cors({
 
 // DB local connection
 const pool = new Pool({
-  user: 'ulissecolla',
+  user: 'ulissecolla', // change to your username
   host: 'localhost',
   database: 'activities',
-  password: '',
+  password: '', // change to your password
   port: 5432,
 });
 

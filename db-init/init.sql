@@ -32,9 +32,11 @@ CREATE TABLE IF NOT EXISTS permissions (
 CREATE TABLE IF NOT EXISTS availability (
   id SERIAL PRIMARY KEY,
   employee_id INTEGER REFERENCES users(id), -- Reference to the employee user
+  role_id INTEGER REFERENCES roles(id), -- Reference to the role requested
   date DATE NOT NULL,
   time TIME NOT NULL,
-  place VARCHAR(255) NOT NULL -- Location of availability
+  place VARCHAR(255) NOT NULL, -- Location of availability
+  status VARCHAR(50) DEFAULT 'available' -- Defines the current status of the availability: available, confirmed
 );
 
 -- Create the roles table
@@ -45,5 +47,5 @@ CREATE TABLE IF NOT EXISTS roles (
   time TIME NOT NULL, -- Can be slightly different from the start time of the activity
   role VARCHAR(255) NOT NULL, -- Role requested
   description TEXT,
-  status VARCHAR(255) NOT NULL -- Defines the current status of the request: pending, confirmed, refused
+  status VARCHAR(50) DEFAULT 'vacant' -- Defines the current status of the request: vacant, pending, confirmed, refused
 );

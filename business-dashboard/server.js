@@ -21,6 +21,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 
+// DB Docker connection
 /* const pool = new Pool({
   user: 'postgres',
   host: 'postgres',
@@ -31,10 +32,10 @@ app.use(cors());
 
 // DB local connection
 const pool = new Pool({
-  user: 'ulissecolla',
+  user: 'ulissecolla', //change to your local user
   host: 'localhost',
   database: 'activities',
-  password: '',
+  password: '', //change to your local password
   port: 5432,
 });
 
@@ -288,7 +289,7 @@ app.post('/activities/roles/:activityId', authenticateToken, protectedRouteBusin
   try {
     await pool.query(
       'INSERT INTO roles (role, description, time, activity_id, status) VALUES ($1, $2, $3, $4, $5)', 
-      [role, description, time, activityId, 'pending']
+      [role, description, time, activityId, 'vacant']
     );
     res.status(201).json({ message: 'Role created successfully' });
   } catch (err) {
@@ -324,6 +325,25 @@ app.delete('/roles/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to delete role', error: err.message });
   }
 });
+
+// Update a role status to pending
+app.put('/roles/:id', async (req, res) => {
+  const { id } = req.params;
+  // const { status } = req.body;
+
+  try {
+    const result = await pool.query(`UPDATE roles SET status = 'pending' WHERE id = $1`, [id]);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Role not found' });
+    }
+
+    res.status(200).json({ message: 'Role status updated successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update role status', error: err.message });
+  }
+});
+
 
 app.listen(4000, () => {
   console.log('Role service running on port 4000');

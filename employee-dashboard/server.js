@@ -21,6 +21,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 
+// DB Docker connection
 /* const pool = new Pool({
   user: 'postgres',
   host: 'postgres',
@@ -31,10 +32,10 @@ app.use(cors());
 
 // DB local connection
 const pool = new Pool({
-  user: 'ulissecolla',
+  user: 'ulissecolla', // change with your username
   host: 'localhost',
   database: 'activities',
-  password: '',
+  password: '', // change with your password
   port: 5432,
 });
 
@@ -116,6 +117,8 @@ app.get('/availability', authenticateToken, protectedRouteEmployee, async (req, 
     res.status(500).json({ message: 'Failed to retrieve availability', error: err.message });
   }
 });
+
+
 
 
 app.listen(3000, () => {

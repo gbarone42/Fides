@@ -29,8 +29,13 @@ async function fetchRoles(activityId) {
 
     roles.forEach(role => {
         const roleItem = document.createElement('div');
+
         roleItem.style.cssText = 'border: 1px solid black; padding: 5px; margin: 5px; display: flex; justify-content: space-between; align-items: center;';
+
         roleItem.textContent = `ROLE: ${role.role} - DESCRIPTION: ${role.description} | ID: ${role.id} | STATUS: ${role.status}`;
+
+        roleItem.innerHTML += `<button style="margin: 3px;" onclick="setPending(${role.id})" style="display: inline;">Set as pending</button>`;
+
         roleItem.innerHTML += `<button style="margin: 3px;" onclick="deleteRole(${role.id}, ${role.activity_id})" style="display: block;">🗑️</button>`;
         roleList.appendChild(roleItem);
     });
