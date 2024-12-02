@@ -20,6 +20,7 @@ async function roleForm(activityId) {
 
         const response = await fetch(`http://localhost:4000/activities/roles/${activityId}`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },

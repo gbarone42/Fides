@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS roles (
   id SERIAL PRIMARY KEY,
   activity_id INTEGER NOT NULL REFERENCES activities(id),
   availability_id INTEGER REFERENCES users(id), -- Reference to the employee's availability user
+  date DATE NOT NULL DEFAULT CURRENT_DATE, -- Date of the activity
   time TIME NOT NULL, -- Can be slightly different from the start time of the activity
   role VARCHAR(255) NOT NULL, -- Role requested
   description TEXT,

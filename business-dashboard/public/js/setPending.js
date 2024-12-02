@@ -4,6 +4,7 @@ async function setPending(roleId) {
     const response = await fetch(`http://localhost:4000/roles/${roleId}`, {
         method: 'PUT',
         headers: {
+            credentials: 'include',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ status: 'pending' })

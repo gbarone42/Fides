@@ -1,6 +1,8 @@
 
 async function fetchActivities() {
-    const response = await fetch('http://localhost:4000/activities');
+    const response = await fetch('http://localhost:4000/activities', {
+        credentials: 'include'
+    });
     const activities = await response.json();
     const activityList = document.getElementById('activity-list');
     activityList.innerHTML = '';

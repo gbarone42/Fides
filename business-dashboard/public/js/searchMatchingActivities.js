@@ -8,7 +8,8 @@ async function searchMatchingActivities(activityId) {
         const response = await fetch(`http://localhost:4000/matching-activities/${activityId}`, {
             headers: {
                 // 'Authorization': `Bearer ${token}`, //DO I need this?
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                credentials: 'include'
             }
         });
 

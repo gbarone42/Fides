@@ -66,7 +66,7 @@ const protectedRouteBusiness = (req, res, next) => {
   try {
     // Check if user has necessary role/permissions
     // console.log('Business route check. User role:', req.user.role);
-    
+
     if (req.user.role !== 'business') {
       return res.status(403).json({ 
         message: 'Access denied', 
@@ -75,6 +75,7 @@ const protectedRouteBusiness = (req, res, next) => {
     }
     next();
   } catch (error) {
+    console.log('Error in business route check:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

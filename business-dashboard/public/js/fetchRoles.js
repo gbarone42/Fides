@@ -12,7 +12,9 @@ async function fetchRoles(activityId) {
     toggleRoles = true;
 
     // const activityId = document.querySelector(`div[data-show-roles-for="${activityId}"]`);
-    const response = await fetch(`http://localhost:4000/activities/${activityId}/roles`);
+    const response = await fetch(`http://localhost:4000/activities/${activityId}/roles`, {
+        credentials: 'include'
+    });
     const roles = await response.json();
     const roleList = document.createElement('div');
     const showRolesDiv = document.querySelector(`div[data-show-roles-for="${activityId}"]`);

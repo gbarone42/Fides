@@ -107,7 +107,7 @@ app.post('/login', async (req, res) => {
     
     // Sign the JWT token with the secret key from the .env file
     const secretKey = process.env.SECRET_KEY;
-    const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });  // Token expires in 1 hour
+    const token = jwt.sign(payload, secretKey, { expiresIn: '10h' });  // Token expires in 1 hour
 
     // Set the JWT as an HttpOnly cookie
     res.cookie('token', token, {
@@ -115,7 +115,7 @@ app.post('/login', async (req, res) => {
       secure: false,                    
       sameSite: 'Lax',                 
       path: '/',                        // Make sure cookie is available everywhere
-      maxAge: 24 * 3600000                   // 1 day expiration
+      maxAge: 36000000                  // 10 hour expiration
     });
 
     console.log('Setting cookie with token: ', token);

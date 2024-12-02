@@ -155,95 +155,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Email sending route
-app.post('/send-email', async (req, res) => {
-  try {
-      const { to, subject, text, html } = req.body;
-
-      // Email options
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: "recipient@example.com",
-        subject: "Confirm availability",
-        // Plain text version for email clients that don't support HTML
-        text: "Click this link to continue: https://yourwebsite.com/action",
-        // HTML version with a styled button
-        html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    .button {
-                        background-color: #4CAF50;
-                        border: none;
-                        color: white;
-                        padding: 15px 32px;
-                        text-align: center;
-                        text-decoration: none;
-                        display: inline-block;
-                        font-size: 16px;
-                        margin: 4px 2px;
-                        cursor: pointer;
-                        border-radius: 4px;
-                    }
-                    
-                    .email-container {
-                        font-family: Arial, sans-serif;
-                        padding: 20px;
-                        max-width: 600px;
-                        margin: 0 auto;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="email-container">
-                    <h1>Welcome!</h1>
-                    <p>Thank you for signing up. Please click the button below to verify your email:</p>
-                    
-                    <!-- Button styled as a link for better email client compatibility -->
-                    <a href="https://yourwebsite.com/action" 
-                       class="button" 
-                       style="background-color: #4CAF50; 
-                              border: none;
-                              color: white;
-                              padding: 15px 32px;
-                              text-align: center;
-                              text-decoration: none;
-                              display: inline-block;
-                              font-size: 16px;
-                              margin: 4px 2px;
-                              cursor: pointer;
-                              border-radius: 4px;">
-                        Click Me!
-                    </a>
-                    
-                    <p>If the button doesn't work, copy and paste this link into your browser:</p>
-                    <p>https://yourwebsite.com/action</p>
-                </div>
-            </body>
-            </html>
-        `
-    };
-
-      // Send email
-      const info = await transporter.sendMail(mailOptions);
-      
-      res.status(200).json({
-          success: true,
-          messageId: info.messageId,
-          message: 'Email sent successfully'
-      });
-
-  } catch (error) {
-      console.error('Error sending email:', error);
-      res.status(500).json({
-          success: false,
-          message: 'Failed to send email',
-          error: error.message
-      });
-  }
-});
-
 
 //Search matching activities
 app.get('/matching-activities/:activityId', authenticateToken, protectedRouteBusiness, async (req, res) => {
@@ -285,11 +196,14 @@ app.post('/activities/roles/:activityId', authenticateToken, protectedRouteBusin
   }
 
   const activityId = req.params.activityId;
+  const activityPlace = await pool.query('SELECT place FROM activities WHERE id = $1', [activityId]);
+  const activityDate = await pool.query('SELECT date FROM activities WHERE id = $1', [activityId]);
+
 
   try {
     await pool.query(
-      'INSERT INTO roles (role, description, time, activity_id, status) VALUES ($1, $2, $3, $4, $5)', 
-      [role, description, time, activityId, 'vacant']
+      'INSERT INTO roles (role, description, time, activity_id, status, place, date) VALUES ($1, $2, $3, $4, $5, $6, $7)', 
+      [role, description, time, activityId, 'vacant', activityPlace.rows[0].place,  activityDate.rows[0].date]
     );
     res.status(201).json({ message: 'Role created successfully' });
   } catch (err) {

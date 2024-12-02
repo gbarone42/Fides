@@ -9,6 +9,7 @@ document.getElementById('availability-form').addEventListener('submit', async (e
     const employee_id = UserState.id;
     await fetch('http://localhost:3000/availability', {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },

@@ -110,7 +110,7 @@ app.get('/availability', authenticateToken, protectedRouteEmployee, async (req, 
             message: 'No availability entries found',
             data: []
         });
-    }
+      }
     
     res.status(200).json(result.rows);
   } catch (err) {
@@ -118,8 +118,151 @@ app.get('/availability', authenticateToken, protectedRouteEmployee, async (req, 
   }
 });
 
+// Endpoint to retrieve matches for the current logged in employee
+app.get('/matching-availability/:availabilityId', authenticateToken, protectedRouteEmployee, async (req, res) => {
 
+  const availabilityId = req.params.availabilityId;
+  console.log('Availability ID: ', availabilityId);
 
+  // First get the availability details
+  const availabilityQuery = `SELECT date, time, place FROM availability WHERE id = $1`;
+  const availabilityResult = await pool.query(availabilityQuery, [availabilityId]);
+
+  const date = availabilityResult.rows[0].date;
+  const time = availabilityResult.rows[0].time;
+  const place = availabilityResult.rows[0].place;
+
+  try {
+
+    const query =
+      `SELECT a.id, a.date, a.time, a.place, a.user_id
+      FROM activities a
+      WHERE a.date = $1
+      AND a.time >= $2
+      AND a.place = $3`;
+
+    const result = await pool.query(query, [date, time, place]);
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({
+          message: 'No matches found',
+          data: []
+      });
+    }
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to retrieve matches', error: err.message });
+  }
+
+});
+
+// Delete a availability by ID
+app.delete('/availability/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('DELETE FROM availability WHERE id = $1', [id]);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Availability not found' });
+    }
+
+    res.status(200).json({ message: 'Availability deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete availability', error: err.message });
+  }
+});
+
+// Endpoint to get roles for the matching activity
+app.get('/matching-roles/:activityId', authenticateToken, protectedRouteEmployee, async (req, res) => {
+
+  const activityId = req.params.activityId;
+  console.log('Activity ID: ', activityId);
+
+  try {
+
+    const query = `
+      SELECT r.role, r.description, r.time, r.status, r.id, r.place, r.date FROM roles r
+      WHERE r.activity_id = $1
+      AND r.status = 'pending'`;
+
+      const result = await pool.query(query, [activityId]);
+
+      if (result.rows.length === 0) {
+        return res.status(200).json({
+            message: 'No matches found',
+            data: []
+        });
+      }
+  
+      res.status(200).json(result.rows);
+
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to retrieve roles', error: err.message });
+  }
+
+});
+
+/* CONFIRM & REFUSE ROLE */
+app.patch('/confirm-role/:roleId', authenticateToken, protectedRouteEmployee, async (req, res) => {
+  const roleId = req.params.roleId;
+
+  try {
+    const result = await pool.query('UPDATE roles SET status = $1 WHERE id = $2', ['confirmed', roleId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Role not found' });
+    }
+
+    res.status(200).json({ message: 'Role confirmed' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to confirm role', error: err.message });
+  }
+});
+
+// Refuse role
+app.patch('/refuse-role/:roleId', authenticateToken, protectedRouteEmployee, async (req, res) => {
+  const roleId = req.params.roleId;
+
+  try {
+    const result = await pool.query('UPDATE roles SET status = $1 WHERE id = $2', ['refused', roleId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Role not found' });
+    }
+
+    res.status(200).json({ message: 'Role refused' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to refuse role', error: err.message });
+  }
+});
+
+/* Fetch confirmed roles */
+app.get('/confirmed-roles', authenticateToken, protectedRouteEmployee, async (req, res) => {
+  try {
+
+    const query = `
+      SELECT r.role, r.description, r.time, r.status, r.id, r.place, r.date FROM roles r
+      WHERE r.status = 'confirmed'
+      AND r.date >= CURRENT_DATE AT TIME ZONE 'UTC'`;
+
+      const result = await pool.query(query);
+
+      if (result.rows.length === 0) {
+        return res.status(200).json({
+            message: 'No confirmed roles found',
+            data: []
+        });
+      }
+  
+      res.status(200).json(result.rows);
+
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to retrieve confirmed roles', error: err.message });
+  }
+
+});
 
 app.listen(3000, () => {
   console.log('Login service running on port 3000');
