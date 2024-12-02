@@ -4,7 +4,7 @@ async function fetchRoles(activityId) {
 
     if (toggleRoles) {
         const rolesDiv = document.querySelector(`div[data-show-roles-for="${activityId}"]`);
-        rolesDiv.innerHTML = `<button style="margin: 3px; display: block;" onclick="fetchRoles(${activityId})">☰</button>`;
+        rolesDiv.innerHTML = `<button onclick="fetchRoles(${activityId})">Show roles</button>`;
         toggleRoles = false;
         return;
     }
@@ -20,8 +20,8 @@ async function fetchRoles(activityId) {
     const showRolesDiv = document.querySelector(`div[data-show-roles-for="${activityId}"]`);
 
     if (roles.length === 0) {
-        roleList.style.cssText = 'border: 1px solid black; padding: 5px; margin: 5px;';
-        roleList.textContent = 'No roles found for this activity';
+        // roleList.style.cssText = 'border: 1px solid black; padding: 5px; margin: 5px;';
+        roleList.innerHTML = '<p><strong>No roles found for this activity</strong></p>';
         showRolesDiv.appendChild(roleList);
         return;
     }
@@ -32,13 +32,11 @@ async function fetchRoles(activityId) {
     roles.forEach(role => {
         const roleItem = document.createElement('div');
 
-        roleItem.style.cssText = 'border: 1px solid black; padding: 5px; margin: 5px; display: flex; justify-content: space-between; align-items: center;';
+        roleItem.innerHTML = `<p><strong>ROLE:</strong> ${role.role}</p> <p><strong>DESCRIPTION:</strong> ${role.description}</p> <p><strong>STATUS:</strong> ${role.status}</p>`;
 
-        roleItem.textContent = `ROLE: ${role.role} - DESCRIPTION: ${role.description} | ID: ${role.id} | STATUS: ${role.status}`;
+        roleItem.innerHTML += `<button onclick="setPending(${role.id})" style="display: inline;">Set as pending</button>`;
 
-        roleItem.innerHTML += `<button style="margin: 3px;" onclick="setPending(${role.id})" style="display: inline;">Set as pending</button>`;
-
-        roleItem.innerHTML += `<button style="margin: 3px;" onclick="deleteRole(${role.id}, ${role.activity_id})" style="display: block;">🗑️</button>`;
+        roleItem.innerHTML += `<button onclick="deleteRole(${role.id}, ${role.activity_id})" style="display: block;">Delete</button>`;
         roleList.appendChild(roleItem);
     });
 

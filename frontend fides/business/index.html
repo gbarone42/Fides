@@ -37,7 +37,7 @@ form label {
 }
 
 form input {
-    width: 100%; /* calc(100% - 20px) */
+    width: calc(100% - 20px);
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
@@ -47,7 +47,7 @@ form input {
 }
 
 form button {
-    display: inline;
+    display: block;
     width: 100%;
     padding: 10px;
     background-color: #2768B4;
@@ -117,20 +117,6 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-#activity-list button {
-    margin-left: 10px;
-    display: inline;
-}
-
-.activity-item {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 20px;
-}
-
-
     </style>
 </head>
 <body>
@@ -158,9 +144,6 @@ button:hover {
     
         <button type="submit">Add Activity</button>
     </form>
-
-    <h2>My Activities</h2>
-    <div id="activity-list"></div>
     
     <h2>Search Activity by Title</h2>
     <input type="text" id="search-query" autocomplete="off" placeholder="Search by title">

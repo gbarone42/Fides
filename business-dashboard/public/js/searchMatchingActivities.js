@@ -2,8 +2,6 @@
  // Show all matching availabilities for a certain activity
 async function searchMatchingActivities(activityId) {
     try {
-        // const token = localStorage.getItem('token'); //DO I need this?
-        // console.log('TOKEN is: ', token);
 
         const response = await fetch(`http://localhost:4000/matching-activities/${activityId}`, {
             headers: {
@@ -24,9 +22,11 @@ async function searchMatchingActivities(activityId) {
         activities.forEach(activity => {
             const formattedDate = new Date(activity.date).toISOString().split('T')[0];
             const item = document.createElement('div');
-            item.textContent = `MATCHING AVAILABILITY --> ${formattedDate} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
+
+            item.innerHTML = `<p><strong>MATCH FOUND:</strong> ${formattedDate} ${activity.time} at ${activity.place}</p> <p>Created by: ${activity.username} (${activity.role})</p>`;
+
+            // item.textContent = `MATCHING AVAILABILITY --> ${formattedDate} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
             activityList.appendChild(item);
-            item.innerHTML += `<button onclick="sendRequest()">Send request</button>`;
         });
     } catch (error) {
         console.error('Error fetching matching activities:', error);

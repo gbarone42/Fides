@@ -9,7 +9,10 @@ async function searchActivities() {
 
     activities.forEach(activity => {
         const item = document.createElement('div');
-        item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
+
+        item.innerHTML = `<p>TITLE: ${activity.title}</p> <p>DESCRIPTION: ${activity.description}</p> <p>DATE & TIME: ${activity.date} ${activity.time} at ${activity.place}</p> <p>Created by: ${activity.username} (${activity.role})</p>`;
+
+        // item.textContent = `${activity.title} - ${activity.description} - ${activity.date} ${activity.time} at ${activity.place} - Created by: ${activity.username} (${activity.role})`;
         item.innerHTML += `<button onclick="deleteActivity(${activity.id})">Delete</button>`;
         activityList.appendChild(item);
     });

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(90deg, #A59D84 0%, #D7D3BF 100%);
+            color: #333;
+        }
+
+        .header {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #112D4E;
+            background-color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #112D4E;
+            margin-top: 60px;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        h2 {
+            text-align: center;
+            color: #112D4E;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        form input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        form button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #2768B4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #112D4E;
+        }
+
+        #availability-list,
+        #matching-availability-list {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #555;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Employee Dashboard</div>
+    
+    <h1>Set Your Availability</h1>
+    <form id="availability-form">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+    
+        <label for="time">Time:</label>
+        <input type="time" id="time" name="time" required>
+    
+        <label for="place">Place:</label>
+        <input type="text" id="place" name="place" required>
+    
+        <button type="submit">Set Availability</button>
+    </form>
+    
+    <h2>Availability List</h2>
+    <div id="availability-list"></div>
+    
+    <h2>Matching Activities</h2>
+    <div id="matching-availability-list"></div>
+    
+    <script src="./js/fetchUserData.js"></script>
+    <script src="./js/fetchAvailability.js"></script>
+    <script src="./js/availabilityForm.js"></script>
+</body>
+</html>
+

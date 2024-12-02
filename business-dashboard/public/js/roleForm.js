@@ -6,7 +6,7 @@ async function roleForm(activityId) {
     console.log('ToggleForm: ', toggleForm)
     if (toggleForm) {
         const formDiv = document.querySelector(`div[data-show-form-for="${activityId}"]`);
-        formDiv.innerHTML = '<button onclick="roleForm(${activityId})" style="display: block;">➕</button>';
+        formDiv.innerHTML = '<button onclick="roleForm(${activityId})" style="display: block;">Add role</button>';
         toggleForm = false;
         return;
     }

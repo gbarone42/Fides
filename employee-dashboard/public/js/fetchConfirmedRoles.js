@@ -25,7 +25,7 @@ async function fetchConfirmedRoles() {
         item.textContent = `CONFIRMED --> ${role.role} - DATE: ${formattedDate} TIME: ${role.time} at ${role.place}`;
 
         //button to delete activity --> deleteAvailability(id)
-        // item.innerHTML += `<button style="margin: 3px;" onclick="deleteAvailability(${availability.id})" style="display: block;">🗑️</button>`;
+        // item.innerHTML += `<button style="margin: 3px;" onclick="deleteAvailability(${availability.id})" style="display: block;">Delete</button>`;
 
         rolesList.appendChild(item);
     });

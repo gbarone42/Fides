@@ -23,7 +23,7 @@ async function fetchAvailability() {
         item.innerHTML += `<button style="margin: 3px;" onclick="searchMatchingAvailability(${availability.id})" style="display: block;">Search matches</button>`;
 
         //button to delete activity --> deleteAvailability(id)
-        item.innerHTML += `<button style="margin: 3px;" onclick="deleteAvailability(${availability.id})" style="display: block;">🗑️</button>`;
+        item.innerHTML += `<button style="margin: 3px;" onclick="deleteAvailability(${availability.id})" style="display: block;">Delete</button>`;
 
         availabilityList.appendChild(item);
     });

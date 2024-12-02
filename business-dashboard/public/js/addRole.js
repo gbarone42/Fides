@@ -5,7 +5,7 @@ function addRole(activityId) {
 
     if (toggleFormBtn) {
         const roleDiv = document.querySelector(`div[data-role-form="${activityId}"]`);
-        roleDiv.innerHTML = `<button style="margin: 3px; display: block;" data-role-id="roleBtn" onclick="addRole(${activityId})">➕</button>`;
+        roleDiv.innerHTML = `<button data-role-id="roleBtn" onclick="addRole(${activityId})">Add role</button>`;
         roleDiv.style.padding = '0'; // Reset padding
         toggleFormBtn = false;
         return;
